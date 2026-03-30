@@ -1,0 +1,12 @@
+# Xcode
+xcuserdata/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xcodeproj
+*.xcworkspace
+.swiftpm
+.build/
+Carthage/Build/
+DerivedData/
