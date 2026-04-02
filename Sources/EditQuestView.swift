@@ -27,7 +27,7 @@ struct EditQuestView: View {
                 } else if quest.isStopwatch {
                     Text(L10n.current == .ja ? "ストップウォッチ型" : "Stopwatch type").foregroundColor(.secondary)
                 } else {
-                    HStack { Text(L10n.current == .ja ? "🔁 1日の回数" : "🔁 Daily count"); Spacer(); TextField("1", value: $quest.dailyCount, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
+                    Stepper(L10n.dailyN(quest.dailyCount), value: $quest.dailyCount, in: 1...9999)
                 }
             }
 

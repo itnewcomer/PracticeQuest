@@ -252,7 +252,7 @@ struct AddQuestSheet: View {
                 } else if isStopwatch {
                     HStack { Text("⭐"); TextField("5", value: $stars, format: .number).keyboardType(.numberPad) }
                 } else {
-                    HStack { Text(L10n.current == .ja ? "🔁 1日の回数" : "🔁 Daily count"); Spacer(); TextField("1", value: $dailyCount, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
+                    Stepper(L10n.dailyN(dailyCount), value: $dailyCount, in: 1...9999)
                     HStack { Text("⭐"); TextField("1", value: $stars, format: .number).keyboardType(.numberPad) }
                 }
             }
