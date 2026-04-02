@@ -15,8 +15,24 @@ struct EditLessonView: View {
             Picker(L10n.weekday, selection: $lesson.weekday) {
                 ForEach(1...7, id: \.self) { Text(L10n.weekdays[$0 - 1]).tag($0) }
             }
-            Stepper("\(lesson.startHour):\(String(format: "%02d", lesson.startMinute))", value: $lesson.startHour, in: 6...21)
-            Stepper(String(format: "  %02d", lesson.startMinute) + (L10n.current == .ja ? "分" : " min"), value: $lesson.startMinute, in: 0...45, step: 15)
+            DatePicker(
+                L10n.current == .ja ? "開始時刻" : "Start time",
+                selection: Binding(
+                    get: {
+                        Calendar.current.date(
+                            bySettingHour: lesson.startHour,
+                            minute: lesson.startMinute,
+                            second: 0,
+                            of: Date()
+                        ) ?? Date()
+                    },
+                    set: { date in
+                        lesson.startHour = Calendar.current.component(.hour, from: date)
+                        lesson.startMinute = Calendar.current.component(.minute, from: date)
+                    }
+                ),
+                displayedComponents: .hourAndMinute
+            )
             Stepper(L10n.current == .ja ? "\(lesson.durationMinutes)分間" : "\(lesson.durationMinutes) min", value: $lesson.durationMinutes, in: 30...180, step: 15)
         }
         .navigationTitle(lesson.name)

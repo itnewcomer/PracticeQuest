@@ -286,8 +286,24 @@ struct AddLessonSheet: View {
                 Picker(L10n.weekday, selection: $weekday) {
                     ForEach(1...7, id: \.self) { Text(weekdays[$0 - 1]).tag($0) }
                 }
-                Stepper(L10n.startTime(hour, minute), value: $hour, in: 6...21)
-                Stepper(String(format: "  %02d", minute) + (L10n.current == .ja ? "分" : " min"), value: $minute, in: 0...45, step: 15)
+                DatePicker(
+                    L10n.current == .ja ? "開始時刻" : "Start time",
+                    selection: Binding(
+                        get: {
+                            Calendar.current.date(
+                                bySettingHour: hour,
+                                minute: minute,
+                                second: 0,
+                                of: Date()
+                            ) ?? Date()
+                        },
+                        set: { date in
+                            hour = Calendar.current.component(.hour, from: date)
+                            minute = Calendar.current.component(.minute, from: date)
+                        }
+                    ),
+                    displayedComponents: .hourAndMinute
+                )
                 Stepper(L10n.durationN(duration), value: $duration, in: 30...180, step: 15)
             }
             .navigationTitle(L10n.addLesson)
