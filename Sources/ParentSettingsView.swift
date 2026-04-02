@@ -151,9 +151,30 @@ struct ParentSettingsView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    Stepper(L10n.current == .ja ? "登校 \(schoolStartHour):\(String(format: "%02d", schoolStartMin))" : "School start \(schoolStartHour):\(String(format: "%02d", schoolStartMin))", value: $schoolStartMin, in: 0...45, step: 15)
-                    Stepper(L10n.current == .ja ? "下校 \(schoolEndHour):\(String(format: "%02d", schoolEndMin))" : "School end \(schoolEndHour):\(String(format: "%02d", schoolEndMin))", value: $schoolEndMin, in: 0...45, step: 15)
-                    Stepper(L10n.current == .ja ? "就寝 \(bedtimeHour):\(String(format: "%02d", bedtimeMin))" : "Bedtime \(bedtimeHour):\(String(format: "%02d", bedtimeMin))", value: $bedtimeMin, in: 0...45, step: 15)
+                    DatePicker(
+                        L10n.current == .ja ? "登校" : "School start",
+                        selection: Binding(
+                            get: { Calendar.current.date(bySettingHour: schoolStartHour, minute: schoolStartMin, second: 0, of: Date()) ?? Date() },
+                            set: { schoolStartHour = Calendar.current.component(.hour, from: $0); schoolStartMin = Calendar.current.component(.minute, from: $0) }
+                        ),
+                        displayedComponents: .hourAndMinute
+                    )
+                    DatePicker(
+                        L10n.current == .ja ? "下校" : "School end",
+                        selection: Binding(
+                            get: { Calendar.current.date(bySettingHour: schoolEndHour, minute: schoolEndMin, second: 0, of: Date()) ?? Date() },
+                            set: { schoolEndHour = Calendar.current.component(.hour, from: $0); schoolEndMin = Calendar.current.component(.minute, from: $0) }
+                        ),
+                        displayedComponents: .hourAndMinute
+                    )
+                    DatePicker(
+                        L10n.current == .ja ? "就寝" : "Bedtime",
+                        selection: Binding(
+                            get: { Calendar.current.date(bySettingHour: bedtimeHour, minute: bedtimeMin, second: 0, of: Date()) ?? Date() },
+                            set: { bedtimeHour = Calendar.current.component(.hour, from: $0); bedtimeMin = Calendar.current.component(.minute, from: $0) }
+                        ),
+                        displayedComponents: .hourAndMinute
+                    )
                 }
 
                 // リセット
@@ -223,15 +244,15 @@ struct AddQuestSheet: View {
                 Toggle(L10n.current == .ja ? "🌟 エクストラクエスト対象" : "🌟 Extra quest eligible", isOn: $allowExtra)
 
                 if isPageType {
-                    Stepper(L10n.totalN(totalPages, L10n.current == .ja ? "ページ" : "pages"), value: $totalPages, in: 1...9999)
+                    HStack { Text(L10n.current == .ja ? "📄 合計ページ" : "📄 Total pages"); Spacer(); TextField("7", value: $totalPages, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                     HStack { Text("⭐"); TextField("14", value: $totalStars, format: .number).keyboardType(.numberPad) }
                 } else if isTimeType {
-                    Stepper(L10n.totalN(targetMinutes, L10n.current == .ja ? "分" : "min"), value: $targetMinutes, in: 5...180, step: 5)
+                    HStack { Text(L10n.current == .ja ? "⏱ 目標時間（分）" : "⏱ Target (min)"); Spacer(); TextField("30", value: $targetMinutes, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                     HStack { Text("⭐"); TextField("14", value: $totalStars, format: .number).keyboardType(.numberPad) }
                 } else if isStopwatch {
                     HStack { Text("⭐"); TextField("5", value: $stars, format: .number).keyboardType(.numberPad) }
                 } else {
-                    Stepper(L10n.dailyN(dailyCount), value: $dailyCount, in: 1...9999)
+                    HStack { Text(L10n.current == .ja ? "🔁 1日の回数" : "🔁 Daily count"); Spacer(); TextField("1", value: $dailyCount, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                     HStack { Text("⭐"); TextField("1", value: $stars, format: .number).keyboardType(.numberPad) }
                 }
             }
@@ -304,7 +325,7 @@ struct AddLessonSheet: View {
                     ),
                     displayedComponents: .hourAndMinute
                 )
-                Stepper(L10n.durationN(duration), value: $duration, in: 30...180, step: 15)
+                HStack { Text(L10n.current == .ja ? "⏱ 時間（分）" : "⏱ Duration (min)"); Spacer(); TextField("60", value: $duration, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
             }
             .navigationTitle(L10n.addLesson)
             .toolbar {
@@ -349,7 +370,7 @@ struct AddRewardSheet: View {
                 }
                 Toggle(L10n.current == .ja ? "⏱ 時間で使うごほうび" : "⏱ Time-based reward", isOn: $isTimeBased)
                 if isTimeBased {
-                    Stepper(L10n.current == .ja ? "\(durationMinutes)分" : "\(durationMinutes) min", value: $durationMinutes, in: 5...180, step: 5)
+                    HStack { Text(L10n.current == .ja ? "⏱ 時間（分）" : "⏱ Duration (min)"); Spacer(); TextField("30", value: $durationMinutes, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                 }
             }
             .navigationTitle(L10n.current == .ja ? "ごほうびを追加" : "Add Reward")

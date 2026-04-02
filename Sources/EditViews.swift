@@ -33,7 +33,7 @@ struct EditLessonView: View {
                 ),
                 displayedComponents: .hourAndMinute
             )
-            Stepper(L10n.current == .ja ? "\(lesson.durationMinutes)分間" : "\(lesson.durationMinutes) min", value: $lesson.durationMinutes, in: 30...180, step: 15)
+            HStack { Text(L10n.current == .ja ? "⏱ 時間（分）" : "⏱ Duration (min)"); Spacer(); TextField("60", value: $lesson.durationMinutes, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
         }
         .navigationTitle(lesson.name)
         .onChange(of: lesson.name) { _, _ in try? modelContext.save() }
@@ -61,7 +61,7 @@ struct EditRewardView: View {
                     .keyboardType(.numberPad)
             }
             if reward.isTimeBased {
-                Stepper(L10n.current == .ja ? "\(reward.durationMinutes)分" : "\(reward.durationMinutes) min", value: $reward.durationMinutes, in: 5...180, step: 5)
+                HStack { Text(L10n.current == .ja ? "⏱ 時間（分）" : "⏱ Duration (min)"); Spacer(); TextField("30", value: $reward.durationMinutes, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
             }
         }
         .navigationTitle(reward.name)

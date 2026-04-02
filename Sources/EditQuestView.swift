@@ -20,14 +20,14 @@ struct EditQuestView: View {
             Section(L10n.current == .ja ? "タイプ" : "Type") {
                 if quest.isPageType {
                     Text(L10n.pageType).foregroundColor(.secondary)
-                    Stepper(L10n.current == .ja ? "全 \(quest.totalPages) ページ" : "Total \(quest.totalPages) pages", value: $quest.totalPages, in: 1...200)
+                    HStack { Text(L10n.current == .ja ? "📄 合計ページ" : "📄 Total pages"); Spacer(); TextField("7", value: $quest.totalPages, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                 } else if quest.isTimeType {
                     Text(L10n.timeType).foregroundColor(.secondary)
-                    Stepper(L10n.current == .ja ? "\(quest.targetMinutes) 分" : "\(quest.targetMinutes) min", value: $quest.targetMinutes, in: 5...180, step: 5)
+                    HStack { Text(L10n.current == .ja ? "⏱ 目標時間（分）" : "⏱ Target (min)"); Spacer(); TextField("30", value: $quest.targetMinutes, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                 } else if quest.isStopwatch {
                     Text(L10n.current == .ja ? "ストップウォッチ型" : "Stopwatch type").foregroundColor(.secondary)
                 } else {
-                    Stepper(L10n.dailyN(quest.dailyCount), value: $quest.dailyCount, in: 1...20)
+                    HStack { Text(L10n.current == .ja ? "🔁 1日の回数" : "🔁 Daily count"); Spacer(); TextField("1", value: $quest.dailyCount, format: .number).keyboardType(.numberPad).multilineTextAlignment(.trailing) }
                 }
             }
 
