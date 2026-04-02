@@ -1,0 +1,25 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app
+
+      - name: Run unit tests
+        run: |
+          xcodebuild test \
+            -project PracticeQuest.xcodeproj \
+            -scheme PracticeQuest \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -only-testing:PracticeQuestTests
