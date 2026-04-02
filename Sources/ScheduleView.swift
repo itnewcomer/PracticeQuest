@@ -24,21 +24,60 @@ struct ScheduleView: View {
     private var isSchoolDay: Bool { schoolDays.contains(selectedWeekday) }
 
     private var lessonsForDay: [Lesson] {
-        lessons.filter { $0.weekday == selectedWeekday }.sorted { $0.startHour < $1.startHour }
+        lessons.filter { $0.weekday == selectedWeekday }
+            .sorted { $0.startHour * 60 + $0.startMinute < $1.startHour * 60 + $1.startMinute }
     }
 
     private var freeMinutes: Int {
         let bedtime = bedtimeHour * 60 + bedtimeMin
-        let dayStart: Int
-        if isSchoolDay {
-            dayStart = schoolEndHour * 60 + schoolEndMin
-        } else {
-            // 休日は朝7時から
-            dayStart = 7 * 60
-        }
-        let totalAvailable = bedtime - dayStart
         let lessonMinutes = lessonsForDay.reduce(0) { $0 + $1.durationMinutes }
-        return max(0, totalAvailable - lessonMinutes)
+        if isSchoolDay {
+            let morningAvailable = schoolStartHour * 60 + schoolStartMin - 7 * 60
+            let afternoonAvailable = bedtime - (schoolEndHour * 60 + schoolEndMin)
+            return max(0, morningAvailable + afternoonAvailable - lessonMinutes)
+        } else {
+            return max(0, bedtime - 7 * 60 - lessonMinutes)
+        }
+    }
+
+    // タイムラインを時刻順に並べるための中間データ
+    private struct ScheduleEntry {
+        let sortMinutes: Int
+        let timeLabel: String
+        let icon: String
+        let title: String
+        let color: Color
+        let isLesson: Bool
+    }
+
+    private var sortedTimeline: [ScheduleEntry] {
+        var entries: [ScheduleEntry] = []
+
+        // 朝クエスト (7:00)
+        entries.append(ScheduleEntry(sortMinutes: 7 * 60, timeLabel: "7:00", icon: "🌅", title: L10n.morningQuest, color: AppColors.morning, isLesson: false))
+
+        // 学校（平日のみ）: 開始・終了の両方を追加
+        if isSchoolDay {
+            let startM = schoolStartHour * 60 + schoolStartMin
+            entries.append(ScheduleEntry(sortMinutes: startM, timeLabel: String(format: "%d:%02d", schoolStartHour, schoolStartMin), icon: "🏫", title: L10n.school, color: AppColors.textSecondary, isLesson: false))
+            let endM = schoolEndHour * 60 + schoolEndMin
+            let endLabel = L10n.current == .ja ? "下校" : "School ends"
+            entries.append(ScheduleEntry(sortMinutes: endM, timeLabel: String(format: "%d:%02d", schoolEndHour, schoolEndMin), icon: "🏫", title: endLabel, color: AppColors.textSecondary, isLesson: false))
+        }
+
+        // 習い事（時刻順）
+        for lesson in lessonsForDay {
+            let m = lesson.startHour * 60 + lesson.startMinute
+            entries.append(ScheduleEntry(sortMinutes: m, timeLabel: lesson.timeString, icon: lesson.icon, title: lesson.name, color: AppColors.accent, isLesson: true))
+        }
+
+        entries.sort { $0.sortMinutes < $1.sortMinutes }
+
+        // おうちクエスト・就寝は常に末尾
+        entries.append(ScheduleEntry(sortMinutes: Int.max - 1, timeLabel: "", icon: "🏠", title: L10n.homeQuest, color: AppColors.afternoon, isLesson: false))
+        entries.append(ScheduleEntry(sortMinutes: Int.max, timeLabel: String(format: "%d:%02d", bedtimeHour, bedtimeMin), icon: "🌙", title: L10n.goodnight, color: AppColors.evening, isLesson: false))
+
+        return entries
     }
 
     var body: some View {
@@ -70,30 +109,14 @@ struct ScheduleView: View {
                 }
                 .card()
 
-                // タイムライン
+                // タイムライン（時刻順）
                 VStack(alignment: .leading, spacing: 0) {
-                    // 朝クエスト
-                    TimelineItem(time: "7:00", icon: "🌅", title: L10n.morningQuest, color: AppColors.morning, isLesson: false)
-
-                    // 学校（平日のみ）
-                    if isSchoolDay {
-                        TimelineItem(time: String(format: "%d:%02d", schoolStartHour, schoolStartMin), icon: "🏫", title: L10n.school, color: AppColors.textSecondary, isLesson: false)
+                    ForEach(Array(sortedTimeline.enumerated()), id: \.offset) { _, entry in
+                        TimelineItem(time: entry.timeLabel, icon: entry.icon, title: entry.title, color: entry.color, isLesson: entry.isLesson)
                     }
-
-                    // 習い事
-                    ForEach(lessonsForDay) { lesson in
-                        TimelineItem(time: lesson.timeString, icon: lesson.icon, title: lesson.name, color: AppColors.accent, isLesson: true)
-                    }
-
                     if lessonsForDay.isEmpty {
                         TimelineItem(time: "", icon: "🎉", title: L10n.noLessons, color: AppColors.success, isLesson: false)
                     }
-
-                    // おうちクエスト
-                    TimelineItem(time: "", icon: "🏠", title: L10n.homeQuest, color: AppColors.afternoon, isLesson: false)
-
-                    // 就寝
-                    TimelineItem(time: String(format: "%d:%02d", bedtimeHour, bedtimeMin), icon: "🌙", title: L10n.goodnight, color: AppColors.evening, isLesson: false)
                 }
                 .card()
 

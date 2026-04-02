@@ -223,16 +223,16 @@ struct AddQuestSheet: View {
                 Toggle(L10n.current == .ja ? "🌟 エクストラクエスト対象" : "🌟 Extra quest eligible", isOn: $allowExtra)
 
                 if isPageType {
-                    Stepper(L10n.totalN(totalPages, L10n.current == .ja ? "ページ" : "pages"), value: $totalPages, in: 1...100)
-                    Stepper(L10n.totalStarsN(totalStars), value: $totalStars, in: 1...100)
+                    Stepper(L10n.totalN(totalPages, L10n.current == .ja ? "ページ" : "pages"), value: $totalPages, in: 1...9999)
+                    HStack { Text("⭐"); TextField("14", value: $totalStars, format: .number).keyboardType(.numberPad) }
                 } else if isTimeType {
                     Stepper(L10n.totalN(targetMinutes, L10n.current == .ja ? "分" : "min"), value: $targetMinutes, in: 5...180, step: 5)
-                    Stepper(L10n.totalStarsN(totalStars), value: $totalStars, in: 1...100)
+                    HStack { Text("⭐"); TextField("14", value: $totalStars, format: .number).keyboardType(.numberPad) }
                 } else if isStopwatch {
-                    Stepper(L10n.starsPerUnit(stars), value: $stars, in: 1...10)
+                    HStack { Text("⭐"); TextField("5", value: $stars, format: .number).keyboardType(.numberPad) }
                 } else {
-                    Stepper(L10n.dailyN(dailyCount), value: $dailyCount, in: 1...20)
-                    Stepper(L10n.starsPerUnit(stars), value: $stars, in: 1...5)
+                    Stepper(L10n.dailyN(dailyCount), value: $dailyCount, in: 1...9999)
+                    HStack { Text("⭐"); TextField("1", value: $stars, format: .number).keyboardType(.numberPad) }
                 }
             }
             .navigationTitle(L10n.addQuest)
@@ -287,6 +287,7 @@ struct AddLessonSheet: View {
                     ForEach(1...7, id: \.self) { Text(weekdays[$0 - 1]).tag($0) }
                 }
                 Stepper(L10n.startTime(hour, minute), value: $hour, in: 6...21)
+                Stepper(String(format: "  %02d", minute) + (L10n.current == .ja ? "分" : " min"), value: $minute, in: 0...45, step: 15)
                 Stepper(L10n.durationN(duration), value: $duration, in: 30...180, step: 15)
             }
             .navigationTitle(L10n.addLesson)
@@ -325,7 +326,11 @@ struct AddRewardSheet: View {
                 Picker(L10n.current == .ja ? "アイコン" : "Icon", selection: $icon) {
                     ForEach(icons, id: \.self) { Text($0).tag($0) }
                 }
-                Stepper("⭐ \(starCost)", value: $starCost, in: 5...1000, step: 5)
+                HStack {
+                    Text("⭐")
+                    TextField("500", value: $starCost, format: .number)
+                        .keyboardType(.numberPad)
+                }
                 Toggle(L10n.current == .ja ? "⏱ 時間で使うごほうび" : "⏱ Time-based reward", isOn: $isTimeBased)
                 if isTimeBased {
                     Stepper(L10n.current == .ja ? "\(durationMinutes)分" : "\(durationMinutes) min", value: $durationMinutes, in: 5...180, step: 5)

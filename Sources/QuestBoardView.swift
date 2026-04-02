@@ -82,8 +82,8 @@ struct QuestBoardView: View {
                         quest: quest,
                         log: logForQuest(quest),
                         isMorningBonus: isMorningBonus, isPastBedtime: isPastBedtime,
-                        onComplete: { stars in
-                            completeOne(quest: quest, stars: stars)
+                        onComplete: { stars, count in
+                            completeOne(quest: quest, stars: stars, count: count)
                         },
                         onUndo: {
                             undoOne(quest: quest)
@@ -128,7 +128,7 @@ struct QuestBoardView: View {
                                 isMorningBonus: isMorningBonus, isPastBedtime: isPastBedtime,
                                 isExtra: true,
                                 extraMultiplier: (allDone && !isPastBedtime) ? 3 : 1,
-                                onComplete: { stars in completeOne(quest: quest, stars: stars) },
+                                onComplete: { stars, count in completeOne(quest: quest, stars: stars, count: count) },
                                 onUndo: { undoOne(quest: quest) }
                             )
                         }
@@ -155,8 +155,8 @@ struct QuestBoardView: View {
         }
     }
 
-    private func completeOne(quest: Quest, stars: Int) {
-        let increment = quest.isTimeType ? 5 : 1
+    private func completeOne(quest: Quest, stars: Int, count: Int = 1) {
+        let increment = quest.isTimeType ? count : 1
         if let log = logForQuest(quest) {
             if !quest.allowExtra {
                 let target = quest.isPageType ? quest.totalPages : (quest.isTimeType ? quest.targetMinutes : quest.dailyCount)
@@ -189,7 +189,7 @@ struct QuestCardView: View {
     var isPastBedtime: Bool = false
     var isExtra: Bool = false
     var extraMultiplier: Int = 1
-    let onComplete: (Int) -> Void
+    let onComplete: (Int, Int) -> Void  // (stars, count)
     let onUndo: () -> Void
     @State private var showTimer = false
     @State private var showStopwatch = false
@@ -292,9 +292,9 @@ struct QuestCardView: View {
                     // 回数型・ページ型: 即完了
                     Button {
                         let baseStars = quest.isPageType ? earnedStarsForPage : quest.starsPerComplete
-                        let stars = baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier 
+                        let stars = baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier
                         let bonus = Int.random(in: 0..<10) == 0 ? 3 : 0
-                        onComplete(isPastBedtime ? 1 : stars + bonus)
+                        onComplete(isPastBedtime ? 1 : stars + bonus, 1)
                     } label: {
                         VStack(spacing: 2) {
                             Image(systemName: quest.isPageType ? "plus.circle.fill" : "checkmark.circle.fill")
@@ -326,7 +326,7 @@ struct QuestCardView: View {
                 let totalBlocks = max(1, quest.targetMinutes / 5)
                 let stars = min(quest.starsPerComplete, quest.starsPerComplete * fiveMinBlocks / totalBlocks)
                 let bonus = isPastBedtime ? -stars/2 : (isMorningBonus ? stars : 0)
-                onComplete(isPastBedtime ? 1 : stars + bonus)
+                onComplete(isPastBedtime ? 1 : stars + bonus, actualMinutes)
             }
         }
         .fullScreenCover(isPresented: $showStopwatch) {
@@ -336,7 +336,7 @@ struct QuestCardView: View {
                 starsOnComplete: quest.starsPerComplete
             ) { stars in
                 let bonus = isPastBedtime ? -stars/2 : (isMorningBonus ? stars : 0)
-                onComplete(isPastBedtime ? 1 : stars + bonus)
+                onComplete(isPastBedtime ? 1 : stars + bonus, 1)
             }
         }
     }

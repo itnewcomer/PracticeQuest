@@ -32,7 +32,7 @@ struct EditQuestView: View {
             }
 
             Section(L10n.current == .ja ? "ほうしゅう" : "Rewards") {
-                Stepper("⭐ \(quest.starsPerComplete)", value: $quest.starsPerComplete, in: 1...100)
+                HStack { Text("⭐"); TextField("1", value: $quest.starsPerComplete, format: .number).keyboardType(.numberPad) }
                 Toggle(L10n.current == .ja ? "🌟 エクストラクエスト対象" : "🌟 Extra quest eligible", isOn: $quest.allowExtra)
             }
         }

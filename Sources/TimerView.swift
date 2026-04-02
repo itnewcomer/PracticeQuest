@@ -35,8 +35,8 @@ struct TimerView: View {
                 Spacer()
                 Button(L10n.current == .ja ? "やめる" : "Stop") {
                     stopTimer()
-                    if elapsedSeconds > 0 {
-                        let minutes = max(1, (elapsedSeconds + 30) / 60)
+                    if elapsedSeconds >= 60 {
+                        let minutes = (elapsedSeconds + 30) / 60
                         onComplete(minutes)
                     }
                     dismiss()
