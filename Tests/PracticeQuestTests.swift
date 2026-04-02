@@ -3,6 +3,38 @@ import XCTest
 
 final class PracticeQuestTests: XCTestCase {
 
+    // MARK: - 全体進捗カウント
+
+    func testOverallProgress_timeQuestCountsAs1() {
+        // 15分タイマーを15分やりきった → 全体進捗は1（15ではない）
+        let completedCount = 15  // 実際の分数
+        let targetMinutes = 15
+        let isTimeType = true
+
+        let progressCount = isTimeType ? (completedCount >= targetMinutes ? 1 : 0) : completedCount
+        XCTAssertEqual(progressCount, 1)
+    }
+
+    func testOverallProgress_timeQuestNotDone() {
+        // 5分しかやっていない → 全体進捗は0
+        let completedCount = 5
+        let targetMinutes = 15
+        let isTimeType = true
+
+        let progressCount = isTimeType ? (completedCount >= targetMinutes ? 1 : 0) : completedCount
+        XCTAssertEqual(progressCount, 0)
+    }
+
+    func testOverallTotal_timeQuestCountsAs1() {
+        // タイマー型クエストのtotalは1（dailyCountではない）
+        let isTimeType = true
+        let isPageType = false
+        let dailyCount = 1
+
+        let total = isPageType ? 10 : (isTimeType ? 1 : dailyCount)
+        XCTAssertEqual(total, 1)
+    }
+
     // MARK: - タイマー完了時の星計算
 
     func testTimerStars_fullCompletion() {

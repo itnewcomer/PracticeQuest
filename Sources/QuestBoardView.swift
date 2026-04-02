@@ -60,8 +60,16 @@ struct QuestBoardView: View {
                 }
 
                 // 今日の進捗
-                let completed = quests.reduce(0) { $0 + (logForQuest($1)?.completedCount ?? 0) }
-                let total = quests.reduce(0) { $0 + ($1.isPageType ? $1.totalPages : $1.dailyCount) }
+                let completed = quests.reduce(0) { sum, quest in
+                    let count = logForQuest(quest)?.completedCount ?? 0
+                    if quest.isTimeType { return sum + (count >= quest.targetMinutes ? 1 : 0) }
+                    return sum + count
+                }
+                let total = quests.reduce(0) { sum, quest in
+                    if quest.isPageType { return sum + quest.totalPages }
+                    if quest.isTimeType { return sum + 1 }
+                    return sum + quest.dailyCount
+                }
                 if total > 0 {
                     VStack(spacing: 6) {
                         Text(L10n.todayQuests)
