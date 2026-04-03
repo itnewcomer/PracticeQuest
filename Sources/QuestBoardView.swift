@@ -180,7 +180,7 @@ struct QuestBoardView: View {
 
     private func undoOne(quest: Quest) {
         guard let log = logForQuest(quest), log.completedCount > 0 else { return }
-        let starsToRemove = quest.starsPerComplete
+        let starsToRemove = Int(round(Double(log.earnedStars) / Double(log.completedCount)))
         log.completedCount -= 1
         log.earnedStars = max(0, log.earnedStars - starsToRemove)
         totalStars = max(0, totalStars - starsToRemove)
