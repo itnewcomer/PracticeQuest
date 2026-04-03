@@ -170,8 +170,9 @@ struct QuestBoardView: View {
             }
             log.completedCount += increment
             log.earnedStars += stars
+            log.starHistory.append(stars)
         } else {
-            let log = QuestLog(questName: quest.name, date: today, completedCount: increment, earnedStars: stars)
+            let log = QuestLog(questName: quest.name, date: today, completedCount: increment, earnedStars: stars, starHistory: [stars])
             modelContext.insert(log)
         }
         totalStars += stars
@@ -180,9 +181,10 @@ struct QuestBoardView: View {
 
     private func undoOne(quest: Quest) {
         guard let log = logForQuest(quest), log.completedCount > 0 else { return }
-        let starsToRemove = Int(round(Double(log.earnedStars) / Double(log.completedCount)))
+        let starsToRemove = log.starHistory.last ?? 0
         log.completedCount -= 1
         log.earnedStars = max(0, log.earnedStars - starsToRemove)
+        if !log.starHistory.isEmpty { log.starHistory.removeLast() }
         totalStars = max(0, totalStars - starsToRemove)
         try? modelContext.save()
     }
@@ -302,7 +304,8 @@ struct QuestCardView: View {
                             Image(systemName: quest.isPageType ? "plus.circle.fill" : "checkmark.circle.fill")
                                 .font(.system(size: 28))
                             let baseStars = quest.isPageType ? earnedStarsForPage : quest.starsPerComplete
-                            Text("⭐+\(baseStars * (isMorningBonus ? 2 : 1))")
+                            let displayStars = isPastBedtime ? 1 : (baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier)
+                            Text("⭐+\(displayStars)")
                                 .font(.system(size: 10, weight: .bold))
                         }
                         .foregroundColor(AppColors.success)
@@ -328,12 +331,11 @@ struct QuestCardView: View {
                 targetMinutes: quest.targetMinutes,
                 starsTotal: quest.starsPerComplete
             ) { actualMinutes in
-                // タイマー完了: 実際の分数に基づいて星を計算
                 let fiveMinBlocks = actualMinutes / 5
                 let totalBlocks = max(1, quest.targetMinutes / 5)
                 let stars = min(quest.starsPerComplete, quest.starsPerComplete * fiveMinBlocks / totalBlocks)
-                let bonus = isPastBedtime ? -stars/2 : (isMorningBonus ? stars : 0)
-                onComplete(isPastBedtime ? 1 : stars + bonus, actualMinutes)
+                let finalStars = isPastBedtime ? 1 : (stars * (isMorningBonus ? 2 : 1) * extraMultiplier)
+                onComplete(finalStars, actualMinutes)
             }
         }
         .fullScreenCover(isPresented: $showStopwatch) {
@@ -342,8 +344,8 @@ struct QuestCardView: View {
                 questIcon: quest.icon,
                 starsOnComplete: quest.starsPerComplete
             ) { stars in
-                let bonus = isPastBedtime ? -stars/2 : (isMorningBonus ? stars : 0)
-                onComplete(isPastBedtime ? 1 : stars + bonus, 1)
+                let finalStars = isPastBedtime ? 1 : (stars * (isMorningBonus ? 2 : 1) * extraMultiplier)
+                onComplete(finalStars, 1)
             }
         }
     }

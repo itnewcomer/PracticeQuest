@@ -45,14 +45,16 @@ class QuestLog {
     var date: Date
     var completedCount: Int
     var earnedStars: Int
-    var bonusStars: Int  // 朝ボーナス、同時刻ボーナス等
+    var bonusStars: Int  // 後方互換のため残す（常に0）
+    var starHistory: [Int]  // 完了ごとの獲得星数履歴（UNDOに使用）
 
-    init(questName: String, date: Date, completedCount: Int = 0, earnedStars: Int = 0, bonusStars: Int = 0) {
+    init(questName: String, date: Date, completedCount: Int = 0, earnedStars: Int = 0, bonusStars: Int = 0, starHistory: [Int] = []) {
         self.questName = questName
         self.date = date
         self.completedCount = completedCount
         self.earnedStars = earnedStars
         self.bonusStars = bonusStars
+        self.starHistory = starHistory
     }
 }
 
