@@ -13,8 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode 26.3
-        run: sudo xcode-select -s /Applications/Xcode_26.3.app
+      - name: Show available Xcode versions
+        run: ls /Applications/ | grep Xcode
+
+      - name: Select latest Xcode
+        run: |
+          XCODE=$(ls /Applications/ | grep "^Xcode" | sort -V | tail -1)
+          echo "Using $XCODE"
+          sudo xcode-select -s /Applications/$XCODE/Contents/Developer
+
+      - name: Show Xcode version
+        run: xcodebuild -version
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -22,10 +31,17 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      - name: Show available simulators
+        run: xcrun simctl list devices available | grep iPhone | head -10
+
       - name: Run unit tests
         run: |
+          SIM_ID=$(xcrun simctl list devices available | grep iPhone | head -1 | grep -oE '[A-F0-9-]{36}')
+          echo "Using simulator: $SIM_ID"
           xcodebuild test \
             -project PracticeQuest.xcodeproj \
             -scheme PracticeQuest \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -only-testing:PracticeQuestTests
+            -destination "id=$SIM_ID" \
+            -only-testing:PracticeQuestTests \
+            2>&1 | tee test_output.txt | grep -E "Test Case|passed|failed|error:"
+          grep -q "TEST FAILED" test_output.txt && exit 1 || exit 0
