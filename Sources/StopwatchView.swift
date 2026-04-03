@@ -19,6 +19,14 @@ struct StopwatchView: View {
                 Text(questIcon).font(.system(size: 24))
                 Text(questName).font(.system(size: 18, weight: .semibold))
                 Spacer()
+                Button {
+                    stop()
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(AppColors.textSecondary)
+                }
             }
             .padding(.horizontal)
 
