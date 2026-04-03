@@ -171,8 +171,9 @@ struct QuestBoardView: View {
             log.completedCount += increment
             log.earnedStars += stars
             log.starHistory.append(stars)
+            log.countHistory.append(increment)
         } else {
-            let log = QuestLog(questName: quest.name, date: today, completedCount: increment, earnedStars: stars, starHistory: [stars])
+            let log = QuestLog(questName: quest.name, date: today, completedCount: increment, earnedStars: stars, starHistory: [stars], countHistory: [increment])
             modelContext.insert(log)
         }
         totalStars += stars
@@ -182,9 +183,11 @@ struct QuestBoardView: View {
     private func undoOne(quest: Quest) {
         guard let log = logForQuest(quest), log.completedCount > 0 else { return }
         let starsToRemove = log.starHistory.last ?? 0
-        log.completedCount -= 1
+        let countToRemove = log.countHistory.last ?? 1
+        log.completedCount = max(0, log.completedCount - countToRemove)
         log.earnedStars = max(0, log.earnedStars - starsToRemove)
         if !log.starHistory.isEmpty { log.starHistory.removeLast() }
+        if !log.countHistory.isEmpty { log.countHistory.removeLast() }
         totalStars = max(0, totalStars - starsToRemove)
         try? modelContext.save()
     }
