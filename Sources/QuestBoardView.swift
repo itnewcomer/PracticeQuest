@@ -253,11 +253,6 @@ struct QuestCardView: View {
                             Circle()
                                 .fill(i < completed ? AppColors.success : AppColors.progressEmpty)
                                 .frame(width: 20, height: 20)
-                                .simultaneousGesture(
-                                    LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-                                        if i < completed { onUndo() }
-                                    }
-                                )
                         }
                         if remaining > 0 {
                             Text(L10n.remaining(remaining))
@@ -321,6 +316,11 @@ struct QuestCardView: View {
         }
         .card()
         .opacity(isDone ? 0.7 : 1.0)
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                if completed > 0 { onUndo() }
+            }
+        )
         .fullScreenCover(isPresented: $showTimer) {
             TimerView(
                 questName: quest.name,
