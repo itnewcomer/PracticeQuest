@@ -178,6 +178,9 @@ struct ParentSettingsView: View {
                     )
                 }
 
+                // バックアップ
+                DataBackupView()
+
                 // リセット
                 Section {
                     // 言語切り替え
