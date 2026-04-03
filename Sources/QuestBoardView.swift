@@ -10,25 +10,22 @@ struct QuestBoardView: View {
     private let calendar = Calendar.current
     private let today = Calendar.current.startOfDay(for: Date())
 
+    @State private var isMorningBonus = false
+    @State private var isPastBedtime = false
+
     private func logForQuest(_ quest: Quest) -> QuestLog? {
         logs.first { $0.questName == quest.name && calendar.isDate($0.date, inSameDayAs: today) }
     }
 
-    private var isMorningBonus: Bool {
-        let hour = calendar.component(.hour, from: Date())
-        let schoolStart = UserDefaults.standard.object(forKey: "schoolStartHour") as? Int ?? 9
-        return hour >= 5 && hour < schoolStart
-    }
-
-    private var isPastBedtime: Bool {
+    private func updateTimeFlags() {
         let hour = calendar.component(.hour, from: Date())
         let min = calendar.component(.minute, from: Date())
         let now = hour * 60 + min
+        let schoolStart = UserDefaults.standard.object(forKey: "schoolStartHour") as? Int ?? 9
         let bedH = UserDefaults.standard.object(forKey: "bedtimeHour") as? Int ?? 20
         let bedM = UserDefaults.standard.object(forKey: "bedtimeMin") as? Int ?? 30
-        let bed = bedH * 60 + bedM
-        // 就寝時間以降 OR 深夜〜早朝5時前
-        return now >= bed || hour < 5
+        isMorningBonus = hour >= 5 && hour < schoolStart
+        isPastBedtime = now >= bedH * 60 + bedM || hour < 5
     }
 
     var body: some View {
@@ -161,6 +158,7 @@ struct QuestBoardView: View {
             .padding(.horizontal)
             .padding(.bottom, 20)
         }
+        .onAppear { updateTimeFlags() }
     }
 
     private func completeOne(quest: Quest, stars: Int, count: Int = 1) {
@@ -254,8 +252,8 @@ struct QuestCardView: View {
                         ForEach(0..<quest.dailyCount, id: \.self) { i in
                             Circle()
                                 .fill(i < completed ? AppColors.success : AppColors.progressEmpty)
-                                .frame(width: 14, height: 14)
-                                .onTapGesture {
+                                .frame(width: 20, height: 20)
+                                .onLongPressGesture {
                                     if i < completed { onUndo() }
                                 }
                         }
@@ -301,8 +299,7 @@ struct QuestCardView: View {
                     Button {
                         let baseStars = quest.isPageType ? earnedStarsForPage : quest.starsPerComplete
                         let stars = baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier
-                        let bonus = Int.random(in: 0..<10) == 0 ? 3 : 0
-                        onComplete(isPastBedtime ? 1 : stars + bonus, 1)
+                        onComplete(isPastBedtime ? 1 : stars, 1)
                     } label: {
                         VStack(spacing: 2) {
                             Image(systemName: quest.isPageType ? "plus.circle.fill" : "checkmark.circle.fill")

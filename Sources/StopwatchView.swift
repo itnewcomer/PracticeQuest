@@ -89,6 +89,9 @@ struct StopwatchView: View {
         .padding(.top)
         .background(AppColors.background)
         .buttonStyle(.plain)
+        .onDisappear {
+            stop()
+        }
     }
 
     private func start() {

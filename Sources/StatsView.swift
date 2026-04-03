@@ -192,7 +192,7 @@ struct StatsView: View {
         var count = 0
         for (_, dayLogs) in grouped {
             let completedNames = Set(dayLogs.filter { $0.completedCount > 0 }.map(\.questName))
-            if questNames.isSubset(of: completedNames) || completedNames.count >= questNames.count {
+            if questNames.isSubset(of: completedNames) {
                 count += 1
             }
         }

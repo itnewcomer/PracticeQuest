@@ -277,6 +277,9 @@ struct RewardTimerView: View {
             remainingSeconds = reward.remainingSeconds
             initialSeconds = reward.remainingSeconds
         }
+        .onDisappear {
+            pauseTimer()
+        }
     }
 
     private func startTimer() {

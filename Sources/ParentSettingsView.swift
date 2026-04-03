@@ -11,6 +11,7 @@ struct ParentSettingsView: View {
     @State private var showAddQuest = false
     @State private var showAddLesson = false
     @State private var showAddReward = false
+    @State private var showResetConfirm = false
     @AppStorage("schoolStartHour") private var schoolStartHour = 9
     @AppStorage("schoolStartMin") private var schoolStartMin = 0
     @AppStorage("schoolEndHour") private var schoolEndHour = 15
@@ -186,13 +187,21 @@ struct ParentSettingsView: View {
                     }
 
                     Button(L10n.current == .ja ? "データをリセット" : "Reset Data", role: .destructive) {
-                        quests.forEach { modelContext.delete($0) }
-                        lessons.forEach { modelContext.delete($0) }
-                        rewards.forEach { modelContext.delete($0) }
-                        UserDefaults.standard.set(0, forKey: "totalStars")
-                        UserDefaults.standard.set(false, forKey: "isSetupDone")
-                        try? modelContext.save()
-                        dismiss()
+                        showResetConfirm = true
+                    }
+                    .alert(L10n.current == .ja ? "リセットしますか？" : "Reset all data?", isPresented: $showResetConfirm) {
+                        Button(L10n.current == .ja ? "リセット" : "Reset", role: .destructive) {
+                            quests.forEach { modelContext.delete($0) }
+                            lessons.forEach { modelContext.delete($0) }
+                            rewards.forEach { modelContext.delete($0) }
+                            UserDefaults.standard.set(0, forKey: "totalStars")
+                            UserDefaults.standard.set(false, forKey: "isSetupDone")
+                            try? modelContext.save()
+                            dismiss()
+                        }
+                        Button(L10n.cancel, role: .cancel) {}
+                    } message: {
+                        Text(L10n.current == .ja ? "クエスト・習い事・ごほうびがすべて削除されます。" : "All quests, lessons and rewards will be deleted.")
                     }
                 }
             }

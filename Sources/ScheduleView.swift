@@ -32,8 +32,8 @@ struct ScheduleView: View {
         let bedtime = bedtimeHour * 60 + bedtimeMin
         let lessonMinutes = lessonsForDay.reduce(0) { $0 + $1.durationMinutes }
         if isSchoolDay {
-            let morningAvailable = schoolStartHour * 60 + schoolStartMin - 7 * 60
-            let afternoonAvailable = bedtime - (schoolEndHour * 60 + schoolEndMin)
+            let morningAvailable = max(0, schoolStartHour * 60 + schoolStartMin - 7 * 60)
+            let afternoonAvailable = max(0, bedtime - (schoolEndHour * 60 + schoolEndMin))
             return max(0, morningAvailable + afternoonAvailable - lessonMinutes)
         } else {
             return max(0, bedtime - 7 * 60 - lessonMinutes)

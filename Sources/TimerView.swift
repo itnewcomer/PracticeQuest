@@ -154,10 +154,12 @@ struct TimerView: View {
         .onChange(of: isOvertime) { _, overtime in
             if overtime && !reachedGoal {
                 reachedGoal = true
-                // 目標達成時のフィードバック
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.success)
             }
+        }
+        .onDisappear {
+            stopTimer()
         }
     }
 
