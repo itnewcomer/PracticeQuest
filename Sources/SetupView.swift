@@ -61,16 +61,14 @@ struct SetupView: View {
 
         let lessons = ja ? [
             Lesson(name: "バレエ", icon: "🩰", weekday: 2, startHour: 16),
-            Lesson(name: "水泳", icon: "🏊", weekday: 3, startHour: 15, startMinute: 30),
-            Lesson(name: "水泳", icon: "🏊", weekday: 3, startHour: 17),
+            Lesson(name: "水泳", icon: "🏊", weekday: 3, startHour: 16),
             Lesson(name: "テコンドー", icon: "🥋", weekday: 4, startHour: 16),
             Lesson(name: "チアリーディング", icon: "📣", weekday: 5, startHour: 16),
             Lesson(name: "アート", icon: "🎨", weekday: 6, startHour: 15, startMinute: 30),
             Lesson(name: "ピアノ教室", icon: "🎹", weekday: 7, startHour: 10),
         ] : [
             Lesson(name: "Ballet", icon: "🩰", weekday: 2, startHour: 16),
-            Lesson(name: "Swimming", icon: "🏊", weekday: 3, startHour: 15, startMinute: 30),
-            Lesson(name: "Swimming", icon: "🏊", weekday: 3, startHour: 17),
+            Lesson(name: "Swimming", icon: "🏊", weekday: 3, startHour: 16),
             Lesson(name: "Taekwondo", icon: "🥋", weekday: 4, startHour: 16),
             Lesson(name: "Cheer", icon: "📣", weekday: 5, startHour: 16),
             Lesson(name: "Art", icon: "🎨", weekday: 6, startHour: 15, startMinute: 30),
