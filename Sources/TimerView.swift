@@ -7,12 +7,14 @@ struct TimerView: View {
     let starsTotal: Int
     let onComplete: (Int) -> Void  // 実際の分数を返す
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var elapsedSeconds = 0
     @State private var isRunning = false
     @State private var timer: Timer?
     @State private var reachedGoal = false
     @State private var showCelebration = false
+    @State private var backgroundedAt: Date?
 
     private var elapsedMinutes: Int { elapsedSeconds / 60 }
     private var remainingSeconds: Int { max(0, targetMinutes * 60 - elapsedSeconds) }
@@ -160,6 +162,16 @@ struct TimerView: View {
         }
         .onDisappear {
             stopTimer()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                if isRunning { backgroundedAt = Date() }
+            } else if phase == .active {
+                if let bg = backgroundedAt {
+                    elapsedSeconds += Int(Date().timeIntervalSince(bg))
+                    backgroundedAt = nil
+                }
+            }
         }
     }
 
