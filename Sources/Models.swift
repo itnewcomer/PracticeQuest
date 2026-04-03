@@ -46,8 +46,18 @@ class QuestLog {
     var completedCount: Int
     var earnedStars: Int
     var bonusStars: Int  // 後方互換のため残す（常に0）
-    var starHistory: [Int]    // 完了ごとの獲得星数履歴（UNDOに使用）
-    var countHistory: [Int]   // 完了ごとのカウント増分履歴（タイマー型UNDOに使用）
+    var starHistoryJSON: String    // 完了ごとの獲得星数履歴 JSON "[10,20]"（UNDOに使用）
+    var countHistoryJSON: String   // 完了ごとのカウント増分履歴 JSON "[1,15]"（タイマー型UNDOに使用）
+
+    // 計算プロパティ（永続化しない）
+    var starHistory: [Int] {
+        get { (try? JSONDecoder().decode([Int].self, from: Data(starHistoryJSON.utf8))) ?? [] }
+        set { starHistoryJSON = (try? String(data: JSONEncoder().encode(newValue), encoding: .utf8)) ?? "[]" }
+    }
+    var countHistory: [Int] {
+        get { (try? JSONDecoder().decode([Int].self, from: Data(countHistoryJSON.utf8))) ?? [] }
+        set { countHistoryJSON = (try? String(data: JSONEncoder().encode(newValue), encoding: .utf8)) ?? "[]" }
+    }
 
     init(questName: String, date: Date, completedCount: Int = 0, earnedStars: Int = 0, bonusStars: Int = 0, starHistory: [Int] = [], countHistory: [Int] = []) {
         self.questName = questName
@@ -55,8 +65,8 @@ class QuestLog {
         self.completedCount = completedCount
         self.earnedStars = earnedStars
         self.bonusStars = bonusStars
-        self.starHistory = starHistory
-        self.countHistory = countHistory
+        self.starHistoryJSON = (try? String(data: JSONEncoder().encode(starHistory), encoding: .utf8)) ?? "[]"
+        self.countHistoryJSON = (try? String(data: JSONEncoder().encode(countHistory), encoding: .utf8)) ?? "[]"
     }
 }
 

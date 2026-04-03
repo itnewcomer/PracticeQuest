@@ -15,14 +15,7 @@ struct PracticeQuestApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            // マイグレーション失敗時: ストアを削除して再作成
-            let url = config.url
-            try? FileManager.default.removeItem(at: url)
-            do {
-                return try ModelContainer(for: schema, configurations: [config])
-            } catch {
-                fatalError("Could not create ModelContainer: \(error)")
-            }
+            fatalError("Could not create ModelContainer: \(error)")
         }
     }()
 
