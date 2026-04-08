@@ -15,6 +15,7 @@ struct TimerView: View {
     @State private var reachedGoal = false
     @State private var showCelebration = false
     @State private var backgroundedAt: Date?
+    @State private var showStopConfirm = false
 
     private var elapsedMinutes: Int { elapsedSeconds / 60 }
     private var remainingSeconds: Int { max(0, targetMinutes * 60 - elapsedSeconds) }
@@ -36,12 +37,12 @@ struct TimerView: View {
                 Text(questName).font(.system(size: 18, weight: .semibold))
                 Spacer()
                 Button(L10n.current == .ja ? "やめる" : "Stop") {
-                    stopTimer()
-                    if elapsedSeconds >= 60 {
-                        let minutes = elapsedSeconds / 60
-                        onComplete(minutes)
+                    if isRunning || elapsedSeconds > 0 {
+                        pauseTimer()
+                        showStopConfirm = true
+                    } else {
+                        dismiss()
                     }
-                    dismiss()
                 }
                 .foregroundColor(AppColors.textSecondary)
             }
@@ -158,6 +159,23 @@ struct TimerView: View {
                 reachedGoal = true
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.success)
+            }
+        }
+        .interactiveDismissDisabled(isRunning)
+        .confirmationDialog(
+            L10n.current == .ja ? "タイマーをやめますか？" : "Stop the timer?",
+            isPresented: $showStopConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.current == .ja ? "やめる（ここまでで記録）" : "Stop & Save") {
+                stopTimer()
+                if elapsedSeconds >= 60 {
+                    onComplete(elapsedSeconds / 60)
+                }
+                dismiss()
+            }
+            Button(L10n.current == .ja ? "つづける" : "Keep going", role: .cancel) {
+                startTimer()
             }
         }
         .onDisappear {

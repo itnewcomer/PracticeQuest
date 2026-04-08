@@ -12,6 +12,7 @@ struct StopwatchView: View {
     @State private var seconds = 0
     @State private var isRunning = false
     @State private var timer: Timer?
+    @State private var showStopConfirm = false
 
     var body: some View {
         VStack(spacing: 32) {
@@ -19,14 +20,16 @@ struct StopwatchView: View {
                 Text(questIcon).font(.system(size: 24))
                 Text(questName).font(.system(size: 18, weight: .semibold))
                 Spacer()
-                Button {
-                    stop()
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(AppColors.textSecondary)
+                Button(L10n.current == .ja ? "やめる" : "Stop") {
+                    if isRunning {
+                        stop()
+                        showStopConfirm = true
+                    } else {
+                        stop()
+                        dismiss()
+                    }
                 }
+                .foregroundColor(AppColors.textSecondary)
             }
             .padding(.horizontal)
 
@@ -97,6 +100,20 @@ struct StopwatchView: View {
         .padding(.top)
         .background(AppColors.background)
         .buttonStyle(.plain)
+        .interactiveDismissDisabled(isRunning)
+        .confirmationDialog(
+            L10n.current == .ja ? "ストップウォッチをやめますか？" : "Stop the stopwatch?",
+            isPresented: $showStopConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.current == .ja ? "やめる" : "Stop", role: .destructive) {
+                seconds = 0
+                dismiss()
+            }
+            Button(L10n.current == .ja ? "つづける" : "Keep going", role: .cancel) {
+                start()
+            }
+        }
         .onDisappear {
             stop()
         }

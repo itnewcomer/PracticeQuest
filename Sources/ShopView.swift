@@ -277,8 +277,15 @@ struct RewardTimerView: View {
             remainingSeconds = reward.remainingSeconds
             initialSeconds = reward.remainingSeconds
         }
+        .interactiveDismissDisabled(isRunning)
         .onDisappear {
-            pauseTimer()
+            if usedSeconds > 0 {
+                pauseTimer()
+                reward.consumeTime(usedSeconds)
+                try? modelContext.save()
+            } else {
+                pauseTimer()
+            }
         }
     }
 
