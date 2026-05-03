@@ -7,6 +7,8 @@ struct ParentSettingsView: View {
     @Query(sort: \Quest.order) private var quests: [Quest]
     @Query(sort: \Lesson.startHour) private var lessons: [Lesson]
     @Query(sort: \Reward.starCost) private var rewards: [Reward]
+    @Query private var logs: [QuestLog]
+    @Query private var stopwatchRecords: [StopwatchRecord]
 
     @State private var showAddQuest = false
     @State private var showAddLesson = false
@@ -197,6 +199,8 @@ struct ParentSettingsView: View {
                             quests.forEach { modelContext.delete($0) }
                             lessons.forEach { modelContext.delete($0) }
                             rewards.forEach { modelContext.delete($0) }
+                            logs.forEach { modelContext.delete($0) }
+                            stopwatchRecords.forEach { modelContext.delete($0) }
                             UserDefaults.standard.set(0, forKey: "totalStars")
                             UserDefaults.standard.set(false, forKey: "isSetupDone")
                             try? modelContext.save()
@@ -204,7 +208,7 @@ struct ParentSettingsView: View {
                         }
                         Button(L10n.cancel, role: .cancel) {}
                     } message: {
-                        Text(L10n.current == .ja ? "クエスト・習い事・ごほうびがすべて削除されます。" : "All quests, lessons and rewards will be deleted.")
+                        Text(L10n.current == .ja ? "クエスト・習い事・ごほうび・練習履歴がすべて削除されます。" : "All quests, lessons, rewards and practice history will be deleted.")
                     }
                 }
             }
