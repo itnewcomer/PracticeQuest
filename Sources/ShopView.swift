@@ -354,6 +354,7 @@ struct RewardTimerView: View {
         if reward.remainingSeconds <= 0 {
             onFinish()
         }
+        usedSeconds = 0
         dismiss()
     }
 
