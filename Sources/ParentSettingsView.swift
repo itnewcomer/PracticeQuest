@@ -278,15 +278,20 @@ struct AddQuestSheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(L10n.add) {
                         guard !name.isEmpty else { return }
+                        let safePages = max(1, totalPages)
+                        let safeMinutes = max(1, targetMinutes)
+                        let safeDailyCount = max(1, dailyCount)
+                        let safeTotalStars = max(1, totalStars)
+                        let safeStars = max(1, stars)
                         let quest = Quest(
                             name: name,
                             icon: icon,
-                            dailyCount: (isPageType || isTimeType) ? 1 : dailyCount,
-                            totalPages: isPageType ? totalPages : 0,
-                            targetMinutes: isTimeType ? targetMinutes : 0,
+                            dailyCount: (isPageType || isTimeType) ? 1 : safeDailyCount,
+                            totalPages: isPageType ? safePages : 0,
+                            targetMinutes: isTimeType ? safeMinutes : 0,
                             isStopwatch: isStopwatch,
                             allowExtra: allowExtra,
-                            starsPerComplete: (isPageType || isTimeType) ? totalStars : stars
+                            starsPerComplete: (isPageType || isTimeType) ? safeTotalStars : safeStars
                         )
                         modelContext.insert(quest)
                         try? modelContext.save()
@@ -349,7 +354,7 @@ struct AddLessonSheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(L10n.add) {
                         guard !name.isEmpty else { return }
-                        modelContext.insert(Lesson(name: name, icon: icon, weekday: weekday, startHour: hour, startMinute: minute, durationMinutes: duration))
+                        modelContext.insert(Lesson(name: name, icon: icon, weekday: weekday, startHour: hour, startMinute: minute, durationMinutes: max(5, duration)))
                         try? modelContext.save()
                         dismiss()
                     }
@@ -395,7 +400,9 @@ struct AddRewardSheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(L10n.current == .ja ? "追加" : "Add") {
                         guard !name.isEmpty else { return }
-                        modelContext.insert(Reward(name: name, icon: icon, starCost: starCost, isTimeBased: isTimeBased, durationMinutes: isTimeBased ? durationMinutes : 0))
+                        let safeCost = max(1, starCost)
+                        let safeDuration = max(1, durationMinutes)
+                        modelContext.insert(Reward(name: name, icon: icon, starCost: safeCost, isTimeBased: isTimeBased, durationMinutes: isTimeBased ? safeDuration : 0))
                         try? modelContext.save()
                         dismiss()
                     }

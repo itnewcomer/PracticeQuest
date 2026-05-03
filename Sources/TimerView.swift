@@ -18,10 +18,11 @@ struct TimerView: View {
     @State private var backgroundedAt: Date?
     @State private var showStopConfirm = false
 
+    private var safeTargetSeconds: Int { max(60, targetMinutes * 60) }
     private var elapsedMinutes: Int { elapsedSeconds / 60 }
-    private var remainingSeconds: Int { max(0, targetMinutes * 60 - elapsedSeconds) }
-    private var isOvertime: Bool { elapsedSeconds >= targetMinutes * 60 }
-    private var overtimeSeconds: Int { max(0, elapsedSeconds - targetMinutes * 60) }
+    private var remainingSeconds: Int { max(0, safeTargetSeconds - elapsedSeconds) }
+    private var isOvertime: Bool { elapsedSeconds >= safeTargetSeconds }
+    private var overtimeSeconds: Int { max(0, elapsedSeconds - safeTargetSeconds) }
 
     // 按分星（5分ごと）
     private var earnedStars: Int {
@@ -60,7 +61,7 @@ struct TimerView: View {
 
                 // 進捗リング
                 Circle()
-                    .trim(from: 0, to: min(1.0, Double(elapsedSeconds) / Double(targetMinutes * 60)))
+                    .trim(from: 0, to: min(1.0, Double(elapsedSeconds) / Double(safeTargetSeconds)))
                     .stroke(
                         isOvertime ? AppColors.bonus : AppColors.success,
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)

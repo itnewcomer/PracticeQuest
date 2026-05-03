@@ -41,6 +41,10 @@ struct EditLessonView: View {
         .onChange(of: lesson.startHour) { _, _ in try? modelContext.save() }
         .onChange(of: lesson.startMinute) { _, _ in try? modelContext.save() }
         .onChange(of: lesson.durationMinutes) { _, _ in try? modelContext.save() }
+        .onDisappear {
+            if lesson.durationMinutes < 5 { lesson.durationMinutes = 5 }
+            try? modelContext.save()
+        }
     }
 }
 
@@ -68,5 +72,10 @@ struct EditRewardView: View {
         .onChange(of: reward.name) { _, _ in try? modelContext.save() }
         .onChange(of: reward.starCost) { _, _ in try? modelContext.save() }
         .onChange(of: reward.durationMinutes) { _, _ in try? modelContext.save() }
+        .onDisappear {
+            if reward.starCost < 1 { reward.starCost = 1 }
+            if reward.isTimeBased, reward.durationMinutes < 1 { reward.durationMinutes = 1 }
+            try? modelContext.save()
+        }
     }
 }

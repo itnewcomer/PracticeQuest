@@ -44,5 +44,12 @@ struct EditQuestView: View {
         .onChange(of: quest.targetMinutes) { _, _ in try? modelContext.save() }
         .onChange(of: quest.starsPerComplete) { _, _ in try? modelContext.save() }
         .onChange(of: quest.allowExtra) { _, _ in try? modelContext.save() }
+        .onDisappear {
+            if quest.isPageType, quest.totalPages < 1 { quest.totalPages = 1 }
+            if quest.isTimeType, quest.targetMinutes < 1 { quest.targetMinutes = 1 }
+            if quest.dailyCount < 1 { quest.dailyCount = 1 }
+            if quest.starsPerComplete < 1 { quest.starsPerComplete = 1 }
+            try? modelContext.save()
+        }
     }
 }
