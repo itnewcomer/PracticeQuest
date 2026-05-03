@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct PracticeQuestApp: App {
@@ -22,6 +23,9 @@ struct PracticeQuestApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task {
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+                }
         }
         .modelContainer(sharedModelContainer)
     }

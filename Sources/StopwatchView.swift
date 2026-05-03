@@ -8,11 +8,13 @@ struct StopwatchView: View {
     let onComplete: (Int) -> Void
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var seconds = 0
     @State private var isRunning = false
     @State private var timer: Timer?
     @State private var showStopConfirm = false
+    @State private var backgroundedAt: Date?
 
     var body: some View {
         VStack(spacing: 32) {
@@ -117,10 +119,19 @@ struct StopwatchView: View {
         .onDisappear {
             stop()
         }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                if isRunning { backgroundedAt = Date() }
+            } else if phase == .active {
+                if let bg = backgroundedAt {
+                    seconds += Int(Date().timeIntervalSince(bg))
+                    backgroundedAt = nil
+                }
+            }
+        }
     }
 
     private func start() {
-        seconds = 0
         isRunning = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in seconds += 1 }
     }

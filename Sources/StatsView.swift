@@ -147,42 +147,12 @@ struct StatsView: View {
                 // ストップウォッチ記録
                 let swGroups = Dictionary(grouping: stopwatchRecords, by: \.questName)
                 ForEach(Array(swGroups.keys.sorted()), id: \.self) { name in
-                    let records = swGroups[name]!.suffix(14)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("⏱ \(name)")
-                            .font(.system(size: 14, weight: .semibold))
-
-                        if let best = records.min(by: { $0.seconds < $1.seconds }) {
-                            Text(L10n.current == .ja ? "ベスト: \(formatSW(best.seconds))" : "Best: \(formatSW(best.seconds))")
-                                .font(.system(size: 12))
-                                .foregroundColor(AppColors.bonus)
-                        }
-
-                        Chart(Array(records.enumerated()), id: \.offset) { idx, record in
-                            LineMark(x: .value("#", idx + 1), y: .value("sec", record.seconds))
-                                .foregroundStyle(AppColors.accent)
-                            PointMark(x: .value("#", idx + 1), y: .value("sec", record.seconds))
-                                .foregroundStyle(AppColors.accent)
-                        }
-                        .chartYAxis {
-                            AxisMarks(position: .leading) { value in
-                                AxisValueLabel {
-                                    if let v = value.as(Int.self) { Text(formatSW(v)).font(.system(size: 9)) }
-                                }
-                            }
-                        }
-                        .frame(height: 120)
-                    }
-                    .card()
+                    StopwatchChartView(name: name, records: Array(swGroups[name]!.suffix(14)))
                 }
             }
             .padding(.horizontal)
             .padding(.bottom, 20)
         }
-    }
-
-    private func formatSW(_ s: Int) -> String {
-        String(format: "%d:%02d", s / 60, s % 60)
     }
 
     private func countAllClearDays() -> Int {
@@ -235,6 +205,63 @@ private struct MilestoneRow: View {
                 Text("\(current)/\(target)").font(.system(size: 11)).foregroundColor(AppColors.textSecondary)
             }
         }
+    }
+}
+
+private struct StopwatchChartView: View {
+    let name: String
+    let records: [StopwatchRecord]
+    @State private var selectedX: Int? = nil
+
+    private var selectedRecord: StopwatchRecord? {
+        guard let x = selectedX, x >= 1, x <= records.count else { return nil }
+        return records[x - 1]
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Text("⏱ \(name)")
+                    .font(.system(size: 14, weight: .semibold))
+                Spacer()
+                if let r = selectedRecord {
+                    VStack(alignment: .trailing, spacing: 1) {
+                        Text(formatSW(r.seconds))
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(AppColors.accent)
+                        Text(r.date, style: .date)
+                            .font(.system(size: 10))
+                            .foregroundColor(AppColors.textSecondary)
+                    }
+                } else if let best = records.min(by: { $0.seconds < $1.seconds }) {
+                    Text(L10n.current == .ja ? "ベスト: \(formatSW(best.seconds))" : "Best: \(formatSW(best.seconds))")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppColors.bonus)
+                }
+            }
+
+            Chart(Array(records.enumerated()), id: \.offset) { idx, record in
+                LineMark(x: .value("#", idx + 1), y: .value("sec", record.seconds))
+                    .foregroundStyle(AppColors.accent)
+                PointMark(x: .value("#", idx + 1), y: .value("sec", record.seconds))
+                    .foregroundStyle(selectedX == idx + 1 ? AppColors.bonus : AppColors.accent)
+                    .symbolSize(selectedX == idx + 1 ? 80 : 30)
+            }
+            .chartXSelection(value: $selectedX)
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisValueLabel {
+                        if let v = value.as(Int.self) { Text(formatSW(v)).font(.system(size: 9)) }
+                    }
+                }
+            }
+            .frame(height: 120)
+        }
+        .card()
+    }
+
+    private func formatSW(_ s: Int) -> String {
+        String(format: "%d:%02d", s / 60, s % 60)
     }
 }
 

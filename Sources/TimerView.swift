@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 struct TimerView: View {
     let questName: String
@@ -188,6 +189,14 @@ struct TimerView: View {
                 if let bg = backgroundedAt {
                     elapsedSeconds += Int(Date().timeIntervalSince(bg))
                     backgroundedAt = nil
+                    if isRunning {
+                        // 目標到達済みなら通知不要、まだなら再スケジュール
+                        if isOvertime {
+                            cancelGoalNotification()
+                        } else {
+                            scheduleGoalNotification()
+                        }
+                    }
                 }
             }
         }
@@ -198,18 +207,41 @@ struct TimerView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             elapsedSeconds += 1
         }
+        scheduleGoalNotification()
     }
 
     private func pauseTimer() {
         isRunning = false
         timer?.invalidate()
         timer = nil
+        cancelGoalNotification()
     }
 
     private func stopTimer() {
         isRunning = false
         timer?.invalidate()
         timer = nil
+        cancelGoalNotification()
+    }
+
+    private func scheduleGoalNotification() {
+        guard !isOvertime else { return }
+        cancelGoalNotification()
+        let remaining = remainingSeconds
+        guard remaining > 0 else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = L10n.current == .ja ? "🎉 目標達成！" : "🎉 Goal reached!"
+        content.body = "\(questIcon) \(questName)"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(remaining), repeats: false)
+        let request = UNNotificationRequest(identifier: "timer-goal", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    private func cancelGoalNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["timer-goal"])
     }
 
     private func formatTime(_ seconds: Int) -> String {

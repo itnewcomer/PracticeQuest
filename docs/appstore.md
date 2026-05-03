@@ -102,3 +102,36 @@ English: practice,kids,homework,timer,reward,habit,piano,math,quest,routine
 
 ## 価格
 無料
+
+---
+
+## バージョン履歴 / Release Notes
+
+### 1.0.3
+**日本語**
+- ごほうびタイマー・練習タイマー・タイム計測クエストがバックグラウンドでも動作するようになりました
+- タイマー終了時にプッシュ通知でお知らせ（YouTube・ゲーム中でも通知が届きます）
+- ストップウォッチのグラフをタップ・スワイプすると、その回の記録と日付が表示されるようになりました
+- タイム計測クエスト中に「やめる」→「つづける」を選んだ時に計測時間が消えてしまう不具合を修正
+
+**English**
+- Reward, practice, and stopwatch quest timers now continue running in the background
+- Receive a push notification when the timer finishes — even while watching YouTube or playing games
+- Tap or swipe the stopwatch chart to see the time and date of each individual record
+- Fixed a bug where stopwatch quest time was reset when tapping "Keep going" after pressing Stop
+
+### 1.0.2
+**日本語**
+- タイマーをやめるときに確認ダイアログを追加（誤って閉じるのを防止）
+- バックグラウンド・画面オフ中もタイマーが止まらないよう改善
+
+**English**
+- Added stop confirmation dialogs to prevent accidental dismissal
+- Timer now continues in the background and with the screen off
+
+### 1.0.1
+**日本語**
+- データのエクスポート／インポート機能を追加（JSON形式でバックアップ可能）
+
+**English**
+- Added data export/import feature with JSON backup support

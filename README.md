@@ -9,7 +9,7 @@
 - Bedtime penalty (reduced stars)
 - Extra quests with 3x bonus after all clear
 - Weekly schedule with lesson blocks & free time calc
-- Stats with weekly chart, stopwatch trends, milestones
+- Stats with weekly chart, interactive stopwatch trends (tap to see each record), milestones
 - Reward shop with time-based rewards (pause/resume timer)
 - Parent settings: quests, lessons, rewards, school times
 - Japanese / English support

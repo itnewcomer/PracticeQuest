@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 struct ShopView: View {
     @Environment(\.modelContext) private var modelContext
@@ -169,12 +170,16 @@ struct RewardTimerView: View {
     let onFinish: () -> Void
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var remainingSeconds: Int = 0
     @State private var initialSeconds: Int = 0
     @State private var timer: Timer?
     @State private var isRunning = false
     @State private var usedSeconds = 0
+    @State private var backgroundedAt: Date?
+    @State private var lastBackgroundUsage: Int = 0
+    @State private var showBackgroundUsage = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -182,6 +187,15 @@ struct RewardTimerView: View {
 
             Text(reward.icon).font(.system(size: 60))
             Text(reward.name).font(.system(size: 24, weight: .bold))
+
+            // Background usage notice (戻ってきた時の演出)
+            Text(showBackgroundUsage
+                 ? (L10n.current == .ja ? "\(lastBackgroundUsage / 60)分つかったよ" : "\(lastBackgroundUsage / 60) min used")
+                 : " ")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(AppColors.bonus)
+                .opacity(showBackgroundUsage ? 1 : 0)
+                .animation(.easeInOut(duration: 0.3), value: showBackgroundUsage)
 
             // カウントダウン
             ZStack {
@@ -287,6 +301,30 @@ struct RewardTimerView: View {
                 pauseTimer()
             }
         }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                if isRunning { backgroundedAt = Date() }
+            } else if phase == .active {
+                if let bg = backgroundedAt {
+                    let elapsed = Int(Date().timeIntervalSince(bg))
+                    let actuallyUsed = min(elapsed, remainingSeconds)
+                    remainingSeconds = max(0, remainingSeconds - elapsed)
+                    usedSeconds += actuallyUsed
+                    backgroundedAt = nil
+                    if remainingSeconds == 0 {
+                        pauseTimer()
+                    }
+                    if actuallyUsed >= 60 {
+                        lastBackgroundUsage = actuallyUsed
+                        showBackgroundUsage = true
+                        Task {
+                            try? await Task.sleep(for: .seconds(3))
+                            showBackgroundUsage = false
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private func startTimer() {
@@ -299,12 +337,14 @@ struct RewardTimerView: View {
                 pauseTimer()
             }
         }
+        scheduleEndNotification()
     }
 
     private func pauseTimer() {
         isRunning = false
         timer?.invalidate()
         timer = nil
+        cancelEndNotification()
     }
 
     private func saveAndDismiss() {
@@ -315,6 +355,23 @@ struct RewardTimerView: View {
             onFinish()
         }
         dismiss()
+    }
+
+    private func scheduleEndNotification() {
+        cancelEndNotification()
+        guard remainingSeconds > 0 else { return }
+        let content = UNMutableNotificationContent()
+        content.title = L10n.current == .ja
+            ? "⏰ \(reward.icon) \(reward.name) のじかんだよ！"
+            : "⏰ Time's up for \(reward.icon) \(reward.name)!"
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(remainingSeconds), repeats: false)
+        let request = UNNotificationRequest(identifier: "reward-timer-\(reward.name)", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    private func cancelEndNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["reward-timer-\(reward.name)"])
     }
 
     private func formatTime(_ s: Int) -> String {
