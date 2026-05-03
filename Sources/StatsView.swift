@@ -156,15 +156,22 @@ struct StatsView: View {
     }
 
     private func countAllClearDays() -> Int {
-        let questNames = Set(quests.map(\.name))
-        guard !questNames.isEmpty else { return 0 }
+        guard !quests.isEmpty else { return 0 }
         let grouped = Dictionary(grouping: logs, by: { calendar.startOfDay(for: $0.date) })
         var count = 0
         for (_, dayLogs) in grouped {
-            let completedNames = Set(dayLogs.filter { $0.completedCount > 0 }.map(\.questName))
-            if questNames.isSubset(of: completedNames) {
-                count += 1
+            let logsByName = Dictionary(uniqueKeysWithValues: dayLogs.map { ($0.questName, $0) })
+            let allDone = quests.allSatisfy { quest in
+                guard let log = logsByName[quest.name] else { return false }
+                let target: Int
+                switch quest.questType {
+                case .page: target = quest.totalPages
+                case .time: target = quest.targetMinutes
+                case .count, .stopwatch: target = quest.dailyCount
+                }
+                return log.completedCount >= target
             }
+            if allDone { count += 1 }
         }
         return count
     }
