@@ -202,6 +202,8 @@ struct TimerView: View {
     }
 
     private func startTimer() {
+        timer?.invalidate()
+        timer = nil
         isRunning = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             elapsedSeconds += 1

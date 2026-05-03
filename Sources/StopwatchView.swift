@@ -132,6 +132,8 @@ struct StopwatchView: View {
     }
 
     private func start() {
+        timer?.invalidate()
+        timer = nil
         isRunning = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in seconds += 1 }
     }

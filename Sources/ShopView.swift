@@ -328,6 +328,8 @@ struct RewardTimerView: View {
     }
 
     private func startTimer() {
+        timer?.invalidate()
+        timer = nil
         isRunning = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if remainingSeconds > 0 {
