@@ -24,11 +24,9 @@ struct TimerView: View {
     private var isOvertime: Bool { elapsedSeconds >= safeTargetSeconds }
     private var overtimeSeconds: Int { max(0, elapsedSeconds - safeTargetSeconds) }
 
-    // 按分星（5分ごと）
+    // 按分星（5分以上は5分ブロック、5分未満は分数比例）
     private var earnedStars: Int {
-        let fiveMinBlocks = elapsedMinutes / 5
-        let totalBlocks = max(1, targetMinutes / 5)
-        return min(starsTotal, max(0, starsTotal * fiveMinBlocks / totalBlocks))
+        Quest.timeQuestStars(elapsedMinutes: elapsedMinutes, targetMinutes: targetMinutes, starsTotal: starsTotal)
     }
 
     var body: some View {

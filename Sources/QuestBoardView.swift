@@ -342,9 +342,7 @@ struct QuestCardView: View {
                 targetMinutes: quest.targetMinutes,
                 starsTotal: quest.starsPerComplete
             ) { actualMinutes in
-                let fiveMinBlocks = actualMinutes / 5
-                let totalBlocks = max(1, quest.targetMinutes / 5)
-                let stars = min(quest.starsPerComplete, quest.starsPerComplete * fiveMinBlocks / totalBlocks)
+                let stars = Quest.timeQuestStars(elapsedMinutes: actualMinutes, targetMinutes: quest.targetMinutes, starsTotal: quest.starsPerComplete)
                 let finalStars = isPastBedtime ? 1 : (stars * (isMorningBonus ? 2 : 1) * extraMultiplier)
                 onComplete(finalStars, actualMinutes)
             }

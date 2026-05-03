@@ -25,6 +25,19 @@ class Quest {
 
     enum QuestType { case count, page, time, stopwatch }
 
+    // 時間型クエストの按分星計算。
+    // 5分以上の目標は従来の5分ブロック単位、5分未満は分数比例で算出。
+    static func timeQuestStars(elapsedMinutes: Int, targetMinutes: Int, starsTotal: Int) -> Int {
+        guard targetMinutes > 0, starsTotal > 0 else { return 0 }
+        if targetMinutes < 5 {
+            let progress = min(1.0, Double(elapsedMinutes) / Double(targetMinutes))
+            return min(starsTotal, max(0, Int(round(Double(starsTotal) * progress))))
+        }
+        let fiveMinBlocks = elapsedMinutes / 5
+        let totalBlocks = max(1, targetMinutes / 5)
+        return min(starsTotal, max(0, starsTotal * fiveMinBlocks / totalBlocks))
+    }
+
     init(name: String, icon: String = "⭐", dailyCount: Int = 1, totalPages: Int = 0, targetMinutes: Int = 0, isStopwatch: Bool = false, allowExtra: Bool = false, starsPerComplete: Int = 1, order: Int = 0) {
         self.name = name
         self.icon = icon
