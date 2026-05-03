@@ -241,7 +241,7 @@ struct AddQuestSheet: View {
     @State private var stars = 1
     @State private var totalStars = 14
 
-    private let icons = ["🎵", "🎹", "📝", "📖", "🏃", "🎨", "🧮", "✏️", "📚", "🎯"]
+    private let icons = IconCatalog.quest
 
     var body: some View {
         NavigationStack {
@@ -315,7 +315,7 @@ struct AddLessonSheet: View {
     @State private var minute = 0
     @State private var duration = 60
 
-    private let icons = ["🩰", "🏊", "🥋", "🥁", "📣", "🎨", "🎹", "⚽", "🎾", "📚", "🏀", "⚾", "🧮", "💃", "🎤", "🏃", "🎯", "🧘", "♟️", "🎻", "🪘", "🏸", "⛸️", "🤸", "🏇", "🧗"]
+    private let icons = IconCatalog.lesson
     private let weekdays = L10n.weekdays
 
     var body: some View {
@@ -375,7 +375,7 @@ struct AddRewardSheet: View {
     @State private var isTimeBased = false
     @State private var durationMinutes = 30
 
-    private let icons = ["🍦", "📱", "🎮", "🧸", "🎢", "🍰", "🎬", "👟", "📕", "🎁"]
+    private let icons = IconCatalog.reward
 
     var body: some View {
         NavigationStack {

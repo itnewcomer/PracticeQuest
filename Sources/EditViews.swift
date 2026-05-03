@@ -4,7 +4,7 @@ import SwiftData
 struct EditLessonView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var lesson: Lesson
-    private let icons = ["🩰", "🏊", "🥋", "🥁", "📣", "🎨", "🎹", "⚽", "🎾", "📚", "🏀", "⚾", "🧮", "💃", "🎤", "🏃", "🎯", "🧘", "♟️", "🎻", "🪘", "🏸", "⛸️", "🤸", "🏇", "🧗"]
+    private let icons = IconCatalog.lesson
 
     var body: some View {
         Form {
@@ -51,7 +51,7 @@ struct EditLessonView: View {
 struct EditRewardView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var reward: Reward
-    private let icons = ["🍦", "📱", "🎮", "🧸", "🎢", "🍰", "🎬", "👟", "📕", "🎁"]
+    private let icons = IconCatalog.reward
 
     var body: some View {
         Form {

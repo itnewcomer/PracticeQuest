@@ -6,7 +6,7 @@ struct EditQuestView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var quest: Quest
 
-    private let icons = ["🎵", "🎹", "📝", "📖", "🏃", "🎨", "🧮", "✏️", "📚", "🎯", "⏱"]
+    private let icons = IconCatalog.quest
 
     var body: some View {
         Form {
