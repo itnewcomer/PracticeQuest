@@ -85,6 +85,8 @@ struct BackupDocument: FileDocument {
 // MARK: - DataBackupView
 
 struct DataBackupView: View {
+    private static let supportedVersion = 1
+
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Quest.order) private var quests: [Quest]
     @Query(sort: \Lesson.startHour) private var lessons: [Lesson]
@@ -242,6 +244,14 @@ struct DataBackupView: View {
         decoder.dateDecodingStrategy = .iso8601
         guard let backup = try? decoder.decode(PracticeQuestBackup.self, from: data) else {
             errorMessage = L10n.current == .ja ? "ファイルの形式が正しくありません" : "Invalid file format"
+            showImportError = true
+            return
+        }
+
+        guard backup.version <= Self.supportedVersion else {
+            errorMessage = L10n.current == .ja
+                ? "新しいバージョンのバックアップです。アプリを更新してください。"
+                : "This backup is from a newer app version. Please update the app."
             showImportError = true
             return
         }
