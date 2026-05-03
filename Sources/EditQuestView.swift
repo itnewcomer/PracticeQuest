@@ -38,6 +38,7 @@ struct EditQuestView: View {
         }
         .navigationTitle(quest.name)
         .onChange(of: quest.name) { _, _ in try? modelContext.save() }
+        .onChange(of: quest.icon) { _, _ in try? modelContext.save() }
         .onChange(of: quest.dailyCount) { _, _ in try? modelContext.save() }
         .onChange(of: quest.totalPages) { _, _ in try? modelContext.save() }
         .onChange(of: quest.targetMinutes) { _, _ in try? modelContext.save() }
