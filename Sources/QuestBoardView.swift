@@ -3,12 +3,13 @@ import SwiftData
 
 struct QuestBoardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Quest.order) private var quests: [Quest]
     @Query private var logs: [QuestLog]
     @Binding var totalStars: Int
 
     private let calendar = Calendar.current
-    private let today = Calendar.current.startOfDay(for: Date())
+    @State private var today = Calendar.current.startOfDay(for: Date())
 
     @State private var isMorningBonus = false
     @State private var isPastBedtime = false
@@ -18,6 +19,7 @@ struct QuestBoardView: View {
     }
 
     private func updateTimeFlags() {
+        today = calendar.startOfDay(for: Date())
         let hour = calendar.component(.hour, from: Date())
         let min = calendar.component(.minute, from: Date())
         let now = hour * 60 + min
@@ -159,6 +161,12 @@ struct QuestBoardView: View {
             .padding(.bottom, 20)
         }
         .onAppear { updateTimeFlags() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { updateTimeFlags() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+            updateTimeFlags()
+        }
     }
 
     private func completeOne(quest: Quest, stars: Int, count: Int = 1) {
