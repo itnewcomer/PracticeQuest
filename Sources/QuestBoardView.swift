@@ -212,6 +212,7 @@ struct QuestCardView: View {
     let onUndo: () -> Void
     @State private var showTimer = false
     @State private var showStopwatch = false
+    @State private var showUndoConfirm = false
 
     private var completed: Int { log?.completedCount ?? 0 }
     private var target: Int {
@@ -348,10 +349,20 @@ struct QuestCardView: View {
         .card()
         .opacity(isDone ? 0.7 : 1.0)
         .simultaneousGesture(
-            LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-                if completed > 0 { onUndo() }
+            LongPressGesture(minimumDuration: 1.0).onEnded { _ in
+                if completed > 0 {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    showUndoConfirm = true
+                }
             }
         )
+        .accessibilityAction(named: Text(L10n.current == .ja ? "取り消す" : "Undo")) {
+            if completed > 0 { onUndo() }
+        }
+        .alert(L10n.current == .ja ? "1回ぶん取り消す？" : "Undo last completion?", isPresented: $showUndoConfirm) {
+            Button(L10n.current == .ja ? "取り消す" : "Undo", role: .destructive) { onUndo() }
+            Button(L10n.cancel, role: .cancel) {}
+        }
         .fullScreenCover(isPresented: $showTimer) {
             TimerView(
                 questName: quest.name,
