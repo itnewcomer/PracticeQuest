@@ -80,7 +80,4 @@ struct L10n {
     static func durationN(_ n: Int) -> String { current == .ja ? "\(n)分間" : "\(n) min" }
     static func starCostN(_ n: Int) -> String { "⭐ \(n)" }
 
-    // StatsView
-    static func totalCount(_ n: Int) -> String { current == .ja ? "合計 \(n)個" : "Total \(n)" }
-    static func freeTimeDisplay(_ h: Int, _ m: Int) -> String { current == .ja ? "空き時間: \(h)時間\(m)分" : "Free: \(h)h \(m)m" }
 }

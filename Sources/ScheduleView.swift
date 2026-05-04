@@ -127,7 +127,7 @@ struct ScheduleView: View {
                 // 空き時間
                 HStack {
                     Text("⏰")
-                    Text(L10n.freeTimeDisplay(freeMinutes / 60, freeMinutes % 60))
+                    Text(L10n.freeTime(freeMinutes / 60, freeMinutes % 60))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(freeMinutes < 60 ? AppColors.bonus : AppColors.textPrimary)
                 }
