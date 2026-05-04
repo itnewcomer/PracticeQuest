@@ -108,7 +108,7 @@ struct StopwatchView: View {
             isPresented: $showStopConfirm,
             titleVisibility: .visible
         ) {
-            Button(L10n.current == .ja ? "やめる" : "Stop", role: .destructive) {
+            Button(L10n.current == .ja ? "記録せずにやめる" : "Discard & stop", role: .destructive) {
                 seconds = 0
                 dismiss()
             }
