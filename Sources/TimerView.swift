@@ -189,12 +189,9 @@ struct TimerView: View {
                     elapsedSeconds += Int(Date().timeIntervalSince(bg))
                     backgroundedAt = nil
                     if isRunning {
-                        // 目標到達済みなら通知不要、まだなら再スケジュール
-                        if isOvertime {
-                            cancelGoalNotification()
-                        } else {
-                            scheduleGoalNotification()
-                        }
+                        // タイマーを確実に再起動（RunLoop 停止中は fire しない場合がある）
+                        startTimer()
+                        if isOvertime { cancelGoalNotification() }
                     }
                 }
             }

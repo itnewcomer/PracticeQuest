@@ -313,6 +313,9 @@ struct RewardTimerView: View {
                     backgroundedAt = nil
                     if remainingSeconds == 0 {
                         pauseTimer()
+                    } else if isRunning {
+                        // タイマーを確実に再起動（バックグラウンド中は RunLoop が止まり Timer が fire しない場合がある）
+                        startTimer()
                     }
                     if actuallyUsed >= 60 {
                         lastBackgroundUsage = actuallyUsed
