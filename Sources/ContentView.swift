@@ -16,14 +16,16 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 // ヘッダー: 星 + 設定
                 HStack {
-                    // 設定ボタン（長押しで開く = 子供が間違って押さない）
-                    Button {
-                        showParentSettings = true
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(AppColors.textSecondary)
-                    }
+                    // 設定ボタン: 長押しで開く（子供が誤タップしないように）
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(AppColors.textSecondary)
+                        .padding(8)
+                        .contentShape(Rectangle())
+                        .onLongPressGesture(minimumDuration: 0.8) {
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            showParentSettings = true
+                        }
 
                     Spacer()
 
