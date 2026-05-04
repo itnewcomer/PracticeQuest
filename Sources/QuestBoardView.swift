@@ -260,17 +260,34 @@ struct QuestCardView: View {
                             .foregroundColor(AppColors.textSecondary)
                     }
                 } else {
-                    // 回数型: ドット
-                    HStack(spacing: 4) {
-                        ForEach(0..<quest.dailyCount, id: \.self) { i in
-                            Circle()
-                                .fill(i < completed ? AppColors.success : AppColors.progressEmpty)
-                                .frame(width: 20, height: 20)
+                    // 回数型: ドット（多い場合はプログレスバーにフォールバック）
+                    let dotLimit = 7
+                    if quest.dailyCount <= dotLimit {
+                        HStack(spacing: 4) {
+                            ForEach(0..<quest.dailyCount, id: \.self) { i in
+                                Circle()
+                                    .fill(i < completed ? AppColors.success : AppColors.progressEmpty)
+                                    .frame(width: 20, height: 20)
+                            }
+                            if remaining > 0 {
+                                Text(L10n.remaining(remaining))
+                                    .font(.system(size: 10))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
                         }
-                        if remaining > 0 {
-                            Text(L10n.remaining(remaining))
-                                .font(.system(size: 10))
-                                .foregroundColor(AppColors.textSecondary)
+                    } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            ProgressView(value: Double(completed), total: Double(quest.dailyCount))
+                                .tint(isDone ? AppColors.success : AppColors.accent)
+                            HStack(spacing: 6) {
+                                Text("\(completed) / \(quest.dailyCount)")
+                                if remaining > 0 {
+                                    Text(L10n.remaining(remaining))
+                                        .foregroundColor(AppColors.textSecondary)
+                                }
+                            }
+                            .font(.system(size: 10))
+                            .foregroundColor(AppColors.textSecondary)
                         }
                     }
                 }
