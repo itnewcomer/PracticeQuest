@@ -99,7 +99,7 @@ struct DataBackupView: View {
     @State private var showImporter = false
     @State private var showImportConfirm = false
     @State private var showImportSuccess = false
-    @State private var showImportError = false
+    @State private var showError = false
     @State private var exportDocument: BackupDocument?
     @State private var pendingImportURL: URL?
     @State private var errorMessage = ""
@@ -142,7 +142,7 @@ struct DataBackupView: View {
         ) { result in
             if case .failure(let error) = result {
                 errorMessage = error.localizedDescription
-                showImportError = true
+                showError = true
             }
         }
         .fileImporter(
@@ -155,7 +155,7 @@ struct DataBackupView: View {
                 showImportConfirm = true
             case .failure(let error):
                 errorMessage = error.localizedDescription
-                showImportError = true
+                showError = true
             }
         }
         .confirmationDialog(
@@ -177,7 +177,7 @@ struct DataBackupView: View {
         } message: {
             Text(ja ? "データを読み込みました。" : "Data imported successfully.")
         }
-        .alert(ja ? "エラー" : "Error", isPresented: $showImportError) {
+        .alert(ja ? "エラー" : "Error", isPresented: $showError) {
             Button("OK") {}
         } message: {
             Text(errorMessage)
@@ -229,14 +229,14 @@ struct DataBackupView: View {
     private func importData(from url: URL) {
         guard url.startAccessingSecurityScopedResource() else {
             errorMessage = L10n.current == .ja ? "ファイルにアクセスできません" : "Cannot access file"
-            showImportError = true
+            showError = true
             return
         }
         defer { url.stopAccessingSecurityScopedResource() }
 
         guard let data = try? Data(contentsOf: url) else {
             errorMessage = L10n.current == .ja ? "ファイルを読み込めません" : "Cannot read file"
-            showImportError = true
+            showError = true
             return
         }
 
@@ -244,7 +244,7 @@ struct DataBackupView: View {
         decoder.dateDecodingStrategy = .iso8601
         guard let backup = try? decoder.decode(PracticeQuestBackup.self, from: data) else {
             errorMessage = L10n.current == .ja ? "ファイルの形式が正しくありません" : "Invalid file format"
-            showImportError = true
+            showError = true
             return
         }
 
@@ -252,7 +252,7 @@ struct DataBackupView: View {
             errorMessage = L10n.current == .ja
                 ? "新しいバージョンのバックアップです。アプリを更新してください。"
                 : "This backup is from a newer app version. Please update the app."
-            showImportError = true
+            showError = true
             return
         }
 

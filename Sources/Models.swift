@@ -142,8 +142,9 @@ class Reward {
         self.remainingSeconds = remainingSeconds
     }
 
-    // 購入時: 残り時間を加算
+    // 購入時: 残り時間を加算（時間系のみ。在庫系は呼び出し側で stockCount を扱う）
     func purchase() {
+        guard isTimeBased else { return }
         remainingSeconds += durationMinutes * 60
     }
 

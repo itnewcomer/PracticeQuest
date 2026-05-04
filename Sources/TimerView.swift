@@ -14,7 +14,6 @@ struct TimerView: View {
     @State private var isRunning = false
     @State private var timer: Timer?
     @State private var reachedGoal = false
-    @State private var showCelebration = false
     @State private var backgroundedAt: Date?
     @State private var showStopConfirm = false
 
@@ -235,13 +234,15 @@ struct TimerView: View {
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(remaining), repeats: false)
-        let request = UNNotificationRequest(identifier: "timer-goal", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: notificationId, content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request)
     }
 
     private func cancelGoalNotification() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["timer-goal"])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationId])
     }
+
+    private var notificationId: String { "timer-goal-\(questName)" }
 
     private func formatTime(_ seconds: Int) -> String {
         let m = seconds / 60

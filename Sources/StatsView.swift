@@ -147,7 +147,7 @@ struct StatsView: View {
                 // ストップウォッチ記録
                 let swGroups = Dictionary(grouping: stopwatchRecords, by: \.questName)
                 ForEach(Array(swGroups.keys.sorted()), id: \.self) { name in
-                    StopwatchChartView(name: name, records: Array(swGroups[name]!.suffix(14)))
+                    StopwatchChartView(name: name, records: Array((swGroups[name] ?? []).suffix(14)))
                 }
             }
             .padding(.horizontal)
