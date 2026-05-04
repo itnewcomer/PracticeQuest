@@ -12,17 +12,20 @@ struct ScheduleView: View {
 
     @State private var selectedWeekday: Int = Calendar.current.component(.weekday, from: Date())
 
+    @AppStorage("schoolStartHour") private var schoolStartHour = 9
+    @AppStorage("schoolStartMin") private var schoolStartMin = 0
+    @AppStorage("schoolEndHour") private var schoolEndHour = 15
+    @AppStorage("schoolEndMin") private var schoolEndMin = 15
+    @AppStorage("bedtimeHour") private var bedtimeHour = 20
+    @AppStorage("bedtimeMin") private var bedtimeMin = 30
+    @AppStorage("wakeupHour") private var wakeupHour = 7
+    @AppStorage("wakeupMin") private var wakeupMin = 0
+
+    // schoolDays は [Int] のため AppStorage で直接扱えない。設定変更は ParentSettings の
+    // 反映に任せ、ScheduleView では body 描画時にスナップショットを読む。
     private var schoolDays: [Int] {
         UserDefaults.standard.array(forKey: "schoolDays") as? [Int] ?? [2,3,4,5,6]
     }
-    private var schoolStartHour: Int { UserDefaults.standard.object(forKey: "schoolStartHour") as? Int ?? 9 }
-    private var schoolStartMin: Int { UserDefaults.standard.object(forKey: "schoolStartMin") as? Int ?? 0 }
-    private var schoolEndHour: Int { UserDefaults.standard.object(forKey: "schoolEndHour") as? Int ?? 15 }
-    private var schoolEndMin: Int { UserDefaults.standard.object(forKey: "schoolEndMin") as? Int ?? 15 }
-    private var bedtimeHour: Int { UserDefaults.standard.object(forKey: "bedtimeHour") as? Int ?? 20 }
-    private var bedtimeMin: Int { UserDefaults.standard.object(forKey: "bedtimeMin") as? Int ?? 30 }
-    private var wakeupHour: Int { UserDefaults.standard.object(forKey: "wakeupHour") as? Int ?? 7 }
-    private var wakeupMin: Int { UserDefaults.standard.object(forKey: "wakeupMin") as? Int ?? 0 }
     private var wakeupMinutes: Int { wakeupHour * 60 + wakeupMin }
 
     private var isSchoolDay: Bool { schoolDays.contains(selectedWeekday) }
