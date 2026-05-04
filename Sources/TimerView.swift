@@ -205,6 +205,7 @@ struct TimerView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             elapsedSeconds += 1
         }
+        NotificationPermission.requestIfNeeded()
         scheduleGoalNotification()
     }
 

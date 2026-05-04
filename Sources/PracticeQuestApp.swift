@@ -23,10 +23,19 @@ struct PracticeQuestApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .task {
-                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
-                }
         }
         .modelContainer(sharedModelContainer)
+    }
+}
+
+// 通知許可を必要なタイミング（タイマー初回起動時など）でリクエストするヘルパ。
+// 起動直後にダイアログを出さず、ユーザーが通知の必要性を理解できる文脈で求める。
+enum NotificationPermission {
+    static func requestIfNeeded() {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            guard settings.authorizationStatus == .notDetermined else { return }
+            center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+        }
     }
 }

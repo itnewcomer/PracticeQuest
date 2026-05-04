@@ -342,6 +342,7 @@ struct RewardTimerView: View {
                 pauseTimer()
             }
         }
+        NotificationPermission.requestIfNeeded()
         scheduleEndNotification()
     }
 
