@@ -9,17 +9,17 @@ struct SetupView: View {
         ScrollView {
             VStack(spacing: 24) {
                 Text("🗡️").font(.system(size: 60))
-                Text("おけいこクエスト")
+                Text(L10n.appTitle)
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
-                Text("まいにちのおけいこを\nたのしいクエストにしよう！")
+                Text(L10n.appSubtitle)
                     .font(.system(size: 16))
                     .foregroundColor(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
 
                 Divider()
 
-                Text("おうちの人へ：サンプルデータで始めます")
+                Text(L10n.sampleNote)
                     .font(.system(size: 13))
                     .foregroundColor(AppColors.textSecondary)
 
@@ -27,7 +27,7 @@ struct SetupView: View {
                     setupSampleData()
                     isSetupDone = true
                 } label: {
-                    Text("はじめる！")
+                    Text(L10n.startButton)
                         .font(.system(size: 18, weight: .bold))
                         .frame(maxWidth: .infinity)
                         .padding()
