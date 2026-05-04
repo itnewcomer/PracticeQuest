@@ -9,6 +9,8 @@ struct ShopView: View {
     @State private var showConfirm = false
     @State private var selectedReward: Reward?
     @State private var timerReward: Reward?
+    @State private var showConsumeConfirm = false
+    @State private var consumeReward: Reward?
 
     private var stockedRewards: [Reward] { rewards.filter { $0.stockCount > 0 || $0.hasTimeLeft } }
 
@@ -65,10 +67,10 @@ struct ShopView: View {
                                     }
                                     .buttonStyle(.plain)
                                 } else {
-                                    // 非時間系: タップで消費
+                                    // 非時間系: 確認してから消費
                                     Button {
-                                        reward.stockCount -= 1
-                                        try? modelContext.save()
+                                        consumeReward = reward
+                                        showConsumeConfirm = true
                                     } label: {
                                         Text(L10n.current == .ja ? "つかう" : "Use")
                                             .font(.system(size: 12, weight: .bold))
@@ -159,6 +161,19 @@ struct ShopView: View {
         .fullScreenCover(item: $timerReward) { reward in
             RewardTimerView(reward: reward) {
                 try? modelContext.save()
+            }
+        }
+        .alert(L10n.useReward, isPresented: $showConsumeConfirm) {
+            Button(L10n.use) {
+                if let reward = consumeReward, reward.stockCount > 0 {
+                    reward.stockCount -= 1
+                    try? modelContext.save()
+                }
+            }
+            Button(L10n.cancel, role: .cancel) {}
+        } message: {
+            if let reward = consumeReward {
+                Text("\(reward.icon) \(reward.name)")
             }
         }
     }
