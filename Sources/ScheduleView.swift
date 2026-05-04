@@ -2,12 +2,13 @@ import SwiftUI
 import SwiftData
 
 struct ScheduleView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Lesson.startHour) private var lessons: [Lesson]
     @Query(sort: \Quest.order) private var quests: [Quest]
 
     private let calendar = Calendar.current
     private var weekdayNames: [String] { L10n.weekdays }
-    private let todayWeekday = Calendar.current.component(.weekday, from: Date())
+    @State private var todayWeekday = Calendar.current.component(.weekday, from: Date())
 
     @State private var selectedWeekday: Int = Calendar.current.component(.weekday, from: Date())
 
@@ -20,6 +21,9 @@ struct ScheduleView: View {
     private var schoolEndMin: Int { UserDefaults.standard.object(forKey: "schoolEndMin") as? Int ?? 15 }
     private var bedtimeHour: Int { UserDefaults.standard.object(forKey: "bedtimeHour") as? Int ?? 20 }
     private var bedtimeMin: Int { UserDefaults.standard.object(forKey: "bedtimeMin") as? Int ?? 30 }
+    private var wakeupHour: Int { UserDefaults.standard.object(forKey: "wakeupHour") as? Int ?? 7 }
+    private var wakeupMin: Int { UserDefaults.standard.object(forKey: "wakeupMin") as? Int ?? 0 }
+    private var wakeupMinutes: Int { wakeupHour * 60 + wakeupMin }
 
     private var isSchoolDay: Bool { schoolDays.contains(selectedWeekday) }
 
@@ -32,11 +36,11 @@ struct ScheduleView: View {
         let bedtime = bedtimeHour * 60 + bedtimeMin
         let lessonMinutes = lessonsForDay.reduce(0) { $0 + $1.durationMinutes }
         if isSchoolDay {
-            let morningAvailable = max(0, schoolStartHour * 60 + schoolStartMin - 7 * 60)
+            let morningAvailable = max(0, schoolStartHour * 60 + schoolStartMin - wakeupMinutes)
             let afternoonAvailable = max(0, bedtime - (schoolEndHour * 60 + schoolEndMin))
             return max(0, morningAvailable + afternoonAvailable - lessonMinutes)
         } else {
-            return max(0, bedtime - 7 * 60 - lessonMinutes)
+            return max(0, bedtime - wakeupMinutes - lessonMinutes)
         }
     }
 
@@ -53,8 +57,8 @@ struct ScheduleView: View {
     private var sortedTimeline: [ScheduleEntry] {
         var entries: [ScheduleEntry] = []
 
-        // 朝クエスト (7:00)
-        entries.append(ScheduleEntry(sortMinutes: 7 * 60, timeLabel: "7:00", icon: "🌅", title: L10n.morningQuest, color: AppColors.morning, isLesson: false))
+        // 朝クエスト
+        entries.append(ScheduleEntry(sortMinutes: wakeupMinutes, timeLabel: String(format: "%d:%02d", wakeupHour, wakeupMin), icon: "🌅", title: L10n.morningQuest, color: AppColors.morning, isLesson: false))
 
         // 学校（平日のみ）: 開始・終了の両方を追加
         if isSchoolDay {
@@ -131,6 +135,12 @@ struct ScheduleView: View {
             }
             .padding(.horizontal)
             .padding(.bottom, 20)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { todayWeekday = calendar.component(.weekday, from: Date()) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+            todayWeekday = calendar.component(.weekday, from: Date())
         }
     }
 }
