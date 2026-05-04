@@ -308,6 +308,7 @@ struct QuestCardView: View {
                         .foregroundColor(AppColors.bonus)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(Text(L10n.current == .ja ? "\(quest.name) を計測する" : "Time \(quest.name)"))
                 } else if quest.isTimeType {
                     // 時間型: タイマー起動
                     Button {
@@ -322,28 +323,29 @@ struct QuestCardView: View {
                         .foregroundColor(AppColors.accent)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(Text(L10n.current == .ja ? "\(quest.name) のタイマーを開始" : "Start \(quest.name) timer"))
                 } else {
                     // 回数型・ページ型: 即完了
+                    let baseStars = quest.isPageType ? earnedStarsForPage : quest.starsPerComplete
+                    let displayStars = isPastBedtime ? 1 : (baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier)
                     Button {
-                        let baseStars = quest.isPageType ? earnedStarsForPage : quest.starsPerComplete
-                        let stars = baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier
-                        onComplete(isPastBedtime ? 1 : stars, 1)
+                        onComplete(displayStars, 1)
                     } label: {
                         VStack(spacing: 2) {
                             Image(systemName: quest.isPageType ? "plus.circle.fill" : "checkmark.circle.fill")
                                 .font(.system(size: 28))
-                            let baseStars = quest.isPageType ? earnedStarsForPage : quest.starsPerComplete
-                            let displayStars = isPastBedtime ? 1 : (baseStars * (isMorningBonus ? 2 : 1) * extraMultiplier)
                             Text("⭐+\(displayStars)")
                                 .font(.system(size: 10, weight: .bold))
                         }
                         .foregroundColor(AppColors.success)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(Text(L10n.current == .ja ? "\(quest.name) を1回クリア、星\(displayStars)もらう" : "Complete \(quest.name), earn \(displayStars) stars"))
                 }
             } else {
                 Text("✅")
                     .font(.system(size: 28))
+                    .accessibilityLabel(Text(L10n.current == .ja ? "\(quest.name) クリア済み" : "\(quest.name) cleared"))
             }
         }
         .card()

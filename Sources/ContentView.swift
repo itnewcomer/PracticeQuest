@@ -83,8 +83,11 @@ struct ContentView: View {
                 Text(label).font(.system(size: 10, weight: selectedTab == index ? .bold : .regular))
             }
             .foregroundColor(selectedTab == index ? AppColors.accent : AppColors.textSecondary)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(Text(label))
+        .accessibilityAddTraits(selectedTab == index ? [.isSelected] : [])
     }
 }
