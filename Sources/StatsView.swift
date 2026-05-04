@@ -19,7 +19,7 @@ struct StatsView: View {
         return (0..<7).map { offset in
             let date = calendar.date(byAdding: .day, value: offset, to: startOfWeek)!
             let dayLogs = logs.filter { calendar.isDate($0.date, inSameDayAs: date) }
-            let stars = dayLogs.reduce(0) { $0 + $1.earnedStars + $1.bonusStars }
+            let stars = dayLogs.reduce(0) { $0 + $1.earnedStars }
             let dayName = weekdayNames[offset]
             return (day: dayName, stars: stars)
         }
@@ -47,7 +47,7 @@ struct StatsView: View {
 
     // 累計星
     private var totalEarnedStars: Int {
-        logs.reduce(0) { $0 + $1.earnedStars + $1.bonusStars }
+        logs.reduce(0) { $0 + $1.earnedStars }
     }
 
     // 累計完了数
@@ -72,7 +72,7 @@ struct StatsView: View {
                         Text("📊 " + L10n.weeklyEffort)
                             .font(.system(size: 14, weight: .semibold))
                         Spacer()
-                        Text(L10n.totalCount(weekTotal))
+                        Text(L10n.total(weekTotal))
                             .font(.system(size: 12))
                             .foregroundColor(AppColors.textSecondary)
                     }
