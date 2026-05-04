@@ -14,6 +14,8 @@ struct ParentSettingsView: View {
     @State private var showAddLesson = false
     @State private var showAddReward = false
     @State private var showResetConfirm = false
+    @AppStorage("wakeupHour") private var wakeupHour = 7
+    @AppStorage("wakeupMin") private var wakeupMin = 0
     @AppStorage("schoolStartHour") private var schoolStartHour = 9
     @AppStorage("schoolStartMin") private var schoolStartMin = 0
     @AppStorage("schoolEndHour") private var schoolEndHour = 15
@@ -154,6 +156,14 @@ struct ParentSettingsView: View {
                             .buttonStyle(.plain)
                         }
                     }
+                    DatePicker(
+                        L10n.current == .ja ? "起きる時間" : "Wake up",
+                        selection: Binding(
+                            get: { Calendar.current.date(bySettingHour: wakeupHour, minute: wakeupMin, second: 0, of: Date()) ?? Date() },
+                            set: { wakeupHour = Calendar.current.component(.hour, from: $0); wakeupMin = Calendar.current.component(.minute, from: $0) }
+                        ),
+                        displayedComponents: .hourAndMinute
+                    )
                     DatePicker(
                         L10n.current == .ja ? "登校" : "School start",
                         selection: Binding(
